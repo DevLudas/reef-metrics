@@ -1,94 +1,122 @@
-# 10x Astro Starter
+# ReefMetrics
 
-A modern, opinionated starter template for building fast, accessible, and AI-friendly web applications.
+[![Project Status: MVP Development](https://img.shields.io/badge/status-MVP%20Development-blue.svg)](https://github.com/jaceksobieraj/reef-metrics)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+A web application for marine aquarium hobbyists to monitor water parameters, analyze results, and receive AI-driven recommendations.
+
+## Table of Contents
+
+- [Project Description](#project-description)
+- [Tech Stack](#tech-stack)
+- [Getting Started Locally](#getting-started-locally)
+- [Available Scripts](#available-scripts)
+- [Project Scope](#project-scope)
+- [Project Status](#project-status)
+- [License](#license)
+
+## Project Description
+
+ReefMetrics is a Minimum Viable Product (MVP) designed to help marine aquarists centralize the monitoring of water parameters. The current process of tracking water chemistry is often fragmented, relying on notebooks or spreadsheets, which makes it difficult to track trends and detect problems.
+
+This application provides a dedicated platform to:
+- Manually enter test results for seven key water parameters.
+- Compare results against predefined or personalized optimal values.
+- Receive AI-generated recommendations when abnormalities are detected.
+- Visualize the health of the aquarium ecosystem with color-coded status indicators.
+
+The goal is to simplify aquarium management by providing a centralized tool for data aggregation, historical tracking, and actionable insights.
 
 ## Tech Stack
 
-- [Astro](https://astro.build/) v5.5.5 - Modern web framework for building fast, content-focused websites
-- [React](https://react.dev/) v19.0.0 - UI library for building interactive components
-- [TypeScript](https://www.typescriptlang.org/) v5 - Type-safe JavaScript
-- [Tailwind CSS](https://tailwindcss.com/) v4.0.17 - Utility-first CSS framework
+### Frontend
+- **Framework**: [Astro 5](https://astro.build/)
+- **UI Library**: [React 19](https://react.dev/) for interactive components
+- **Language**: [TypeScript 5](https://www.typescriptlang.org/)
+- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
+- **Components**: [Shadcn/ui](https://ui.shadcn.com/)
 
-## Prerequisites
+### Backend
+- **Service**: [Supabase](https://supabase.com/)
+  - **Database**: PostgreSQL
+  - **Authentication**: Built-in user management
+  - **APIs**: Backend-as-a-Service
 
-- Node.js v22.14.0 (as specified in `.nvmrc`)
-- npm (comes with Node.js)
+### AI
+- **Service**: [Openrouter.ai](https://openrouter.ai/) for access to various large language models.
 
-## Getting Started
+### DevOps
+- **CI/CD**: GitHub Actions
+- **Hosting**: DigitalOcean (via Docker)
 
-1. Clone the repository:
+## Getting Started Locally
 
-```bash
-git clone https://github.com/przeprogramowani/10x-astro-starter.git
-cd 10x-astro-starter
-```
+To set up and run this project locally, follow these steps:
 
-2. Install dependencies:
+1.  **Clone the repository:**
+    ```sh
+    git clone https://github.com/jaceksobieraj/reef-metrics.git
+    cd reef-metrics
+    ```
 
-```bash
-npm install
-```
+2.  **Set up Node.js:**
+    Ensure you are using the correct Node.js version as specified in the `.nvmrc` file. If you use `nvm`, you can run:
+    ```sh
+    nvm use
+    ```
 
-3. Run the development server:
+3.  **Install dependencies:**
+    ```sh
+    npm install
+    ```
 
-```bash
-npm run dev
-```
+4.  **Set up environment variables:**
+    Create a `.env` file in the root of the project and add the necessary environment variables for Supabase.
+    ```env
+    PUBLIC_SUPABASE_URL="your-supabase-url"
+    PUBLIC_SUPABASE_ANON_KEY="your-supabase-anon-key"
+    ```
 
-4. Build for production:
-
-```bash
-npm run build
-```
+5.  **Run the development server:**
+    ```sh
+    npm run dev
+    ```
+    The application will be available at `http://localhost:4321`.
 
 ## Available Scripts
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-- `npm run lint:fix` - Fix ESLint issues
+The following scripts are available in `package.json`:
 
-## Project Structure
+- `npm run dev`: Starts the development server.
+- `npm run build`: Builds the application for production.
+- `npm run preview`: Previews the production build locally.
+- `npm run lint`: Lints the codebase using ESLint.
+- `npm run lint:fix`: Lints and automatically fixes issues.
+- `npm run format`: Formats the code using Prettier.
 
-```md
-.
-├── src/
-│   ├── layouts/    # Astro layouts
-│   ├── pages/      # Astro pages
-│   │   └── api/    # API endpoints
-│   ├── components/ # UI components (Astro & React)
-│   └── assets/     # Static assets
-├── public/         # Public assets
-```
+## Project Scope
 
-## AI Development Support
+### Included Features (MVP)
 
-This project is configured with AI development tools to enhance the development experience, providing guidelines for:
+- **User Management**: Secure user registration, login, logout, and password reset.
+- **Aquarium Management**: Users can add, edit, and delete one or more aquariums in their profile.
+- **Parameter Tracking**: Track 7 key parameters: Salinity (SG), Carbonate Hardness (kH), Calcium (Ca), Magnesium (Mg), Phosphates (PO4), Nitrates (NO3), and Temperature.
+- **Dashboard**: A central dashboard displaying the most recent measurements with color-coded status indicators (Green, Orange, Red) to show deviation from optimal values.
+- **AI Recommendations**: AI-generated analysis and corrective actions for each parameter.
 
-- Project structure
-- Coding practices
-- Frontend development
-- Styling with Tailwind
-- Accessibility best practices
-- Astro and React guidelines
+### Excluded Features (Future Versions)
 
-### Cursor IDE
+- Importing measurement data from external files (e.g., CSV).
+- Generating charts to show parameter trends over time.
+- Social features, such as sharing results with other users.
+- Exporting reports and summaries to PDF.
+- A dedicated mobile application.
 
-The project includes AI rules in `.cursor/rules/` directory that help Cursor IDE understand the project structure and provide better code suggestions.
+## Project Status
 
-### GitHub Copilot
-
-AI instructions for GitHub Copilot are available in `.github/copilot-instructions.md`
-
-### Windsurf
-
-The `.windsurfrules` file contains AI configuration for Windsurf.
-
-## Contributing
-
-Please follow the AI guidelines and coding practices defined in the AI configuration files when contributing to this project.
+This project is currently in the **MVP development phase**. The core features are being built, and the focus is on delivering a stable and functional product that addresses the primary user problem.
 
 ## License
 
-MIT
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
+
