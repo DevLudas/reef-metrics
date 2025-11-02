@@ -1,104 +1,247 @@
 # Product Requirements Document (PRD) - ReefMetrics
 ## 1. Product Overview
-ReefMetrics is a web application MVP (Minimum Viable Product) designed for marine aquarium hobbyists. Its main goal is to centralize the process of monitoring water parameters in a single place. The app allows users to manually enter test results for seven key parameters, analyze them against predefined or personalized optimal values, and receive AI-generated recommendations when abnormalities are detected.
+ReefMetrics is a web application targeted at marine aquarium hobbyists. Its main goal is to centralize the process of monitoring water parameters in an aquarium. The application allows users to manually enter test results for seven key parameters, analyze them against predefined or personalized optimal values, and offers support in the form of AI-generated recommendations when abnormalities are detected.
 
 ## 2. User Problem
-Marine aquarists must regularly monitor water chemistry to ensure the health and stability of their ecosystems. Currently, this process is fragmented—data are often recorded in notebooks, spreadsheets, or remembered, making trend tracking and problem detection difficult. There is no dedicated tool that aggregates historical data and actively supports users in interpreting them. Users need a platform that compares their results against optimal values, visually highlights deviations, and provides actionable insights for corrective measures, simplifying aquarium management.
+Marine aquarists must regularly monitor water parameters to ensure the health and stability of their ecosystem. Currently, this process is fragmented – data is often recorded in physical notebooks, spreadsheets, or in memory, making it difficult to track trends and quickly identify problems. There is a lack of one dedicated tool that not only aggregates historical data but also actively supports the user in interpreting it. Users need a platform that compares their results with optimal values, visually signals deviations, and provides general guidance on corrective actions, significantly simplifying aquarium management.
 
 ## 3. Functional Requirements
 ### User and Profile Management
-- Users can create an account using an email and password.
-- The system provides login, logout, and password reset mechanisms.
+- Users can create an account in the system using an email address and password.
+- The system provides mechanisms for logging in, logging out, and password reset.
 - After logging in, users can add one or more aquariums to their profile.
-- Each aquarium has a name, type (e.g., LPS, SPS, fish-only), and description.
+- Each aquarium has a name, type (e.g., LPS, SPS, fish only), and description.
 - Users can edit and delete existing aquariums.
 
-### Parameter and Measurement Management
-- The app tracks 7 key parameters: salinity (SG), carbonate hardness (kH), calcium (Ca), magnesium (Mg), phosphates (PO4), nitrates (NO3), and temperature.
-- The app provides default, editable optimal values for each aquarium type.
-- Users can input new sets of measurements using a simple form.
-- Each record is automatically timestamped with date and time.
+### Parameters and Measurements Management
+- The application tracks 7 key parameters: salinity (SG), carbonate hardness (kH), calcium (Ca), magnesium (Mg), phosphates (PO4), nitrates (NO3), and temperature.
+- The application provides default, editable optimal values for each aquarium type.
+- Users can enter new measurement sets through a simple form.
+- Each entry is automatically timestamped (date and time).
 - Users can edit and delete previously entered measurements.
-- Data validation in the MVP version is limited to verifying the data type (e.g., if the value is numeric).
+- Data validation at the MVP level is limited to checking data types (e.g., whether the value is a number).
 
 ### Dashboard and Data Visualization
-- The main dashboard displays the most recent measurement by default.
-- For users with multiple aquariums, a dropdown menu allows easy switching between tanks.
-- Each parameter has a dedicated panel showing the current value, target value, and color-coded status indicator:
-    - Green: deviation below 10% of optimal value
-    - Orange: deviation between 10%–20%
-    - Red: deviation above 20%
-- The dashboard includes a calendar component for navigating and displaying historical measurements.
-- New users with no data see a message encouraging them to add their first measurement.
+- The main dashboard displays the last recorded measurement set by default.
+- When multiple aquariums are present, users can easily switch between them using a dropdown list.
+- For each parameter, a separate panel is displayed that contains the current value, target value, and color-coded status indicator:
+    - Green: deviation below 10% from the optimal value.
+    - Orange: deviation between 10% and 20%.
+    - Red: deviation above 20%.
+- The dashboard includes a calendar element that allows navigation and display of historical measurements.
+- For new users who have not yet added any measurements, the dashboard displays a message encouraging them to add their first entry.
 
-### AI Analysis and Recommendations
-- Clicking on a parameter panel displays an analysis and corrective actions generated by AI.
-- Recommendations are general and do not promote commercial products.
-- Each AI suggestion is clearly labeled as a recommendation with a disclaimer stating that implementation responsibility lies solely with the user.
+### Analysis and AI Recommendations
+- After clicking on a parameter panel, users are presented with analysis and corrective suggestions generated by AI.
+- Recommendations are general in nature and do not promote specific commercial products.
+- Each AI-generated suggestion is clearly marked as a recommendation, accompanied by a disclaimer stating that the final decision and responsibility for its implementation rests with the user.
 
 ## 4. Product Boundaries
-The following features are outside the MVP scope but may be considered in future versions:
-- Importing measurement data from external files (e.g., CSV).
-- Generating charts showing parameter trends over time.
-- Social features such as sharing results with other users.
-- Exporting reports and summaries to PDF.
-- Dedicated mobile application (MVP is a web-based product).
-- Integration with external analytic tools (success tracking will rely on direct database queries).
+The following functionalities are not within the scope of the MVP version and may be considered in future product iterations:
+- Import of measurement data from external files (e.g., CSV).
+- Generation of charts showing parameter value changes over time.
+- Social features, such as sharing results with other users.
+- Exporting reports and summaries to PDF format.
+- Dedicated mobile application (the MVP version product is a web application).
+- Integration with external analytics tools for tracking metrics (success measurement will be performed through direct database queries).
 
 ## 5. User Stories
 
 ### ID
 US-001
 ### Title
-User registration
+New User Registration
 ### Description
-As a new user, I want to register using my email and password so I can access all app features.
+As a new person visiting the application, I want to be able to create an account by providing my email address and password, so that I can access all functionalities.
 ### Acceptance Criteria
-- A “Sign Up” button is visible on the main page.
-- The registration form requires an email and password (with confirmation).
-- The system validates the email format.
-- The system verifies password confirmation match.
-- Successful registration creates a new account in the database.
-- The user is automatically logged in and redirected to the aquarium creation view.
+- The home page has a "Sign Up" button.
+- The registration form requires an email address and password (with confirmation).
+- The system validates that the provided email address has the correct format.
+- The system checks that the passwords in both fields are identical.
+- After successful validation and form submission, a new user account is created in the database.
+- The user is automatically logged in and redirected to the view for adding their first aquarium.
 
 ### ID
 US-002
 ### Title
-Logging into the system
+System Login
 ### Description
-As a registered user, I want to log into my account using email and password to access my data.
+As a registered user, I want to be able to log into my account using my email address and password to access my data.
 ### Acceptance Criteria
-- The main page includes a “Log In” button.
-- The login form includes fields for email and password.
-- Invalid credentials trigger an appropriate error message.
-- Upon successful login, the user is redirected to the main dashboard.
+- The home page has a "Sign In" button.
+- The login form contains fields for email address and password.
+- In case of incorrect credentials, the system displays an appropriate message.
+- After successful login, the user is redirected to the main dashboard.
 
 ### ID
 US-003
 ### Title
-Logging out
+System Logout
 ### Description
-As a logged-in user, I want to securely log out of the app to end my session.
+As a logged-in user, I want to be able to securely log out of the application to end my session.
 ### Acceptance Criteria
-- A visible “Log Out” option exists in the user menu.
-- Clicking it terminates the session.
-- The user is redirected to the login or home page.
+- In the application interface (e.g., in the user menu), there is a visible "Log Out" button.
+- After clicking the button, the user's session is ended.
+- The user is redirected to the login page or the application's home page.
 
 ### ID
 US-004
 ### Title
-Password reset
+Password Reset
 ### Description
-As a user who forgot my password, I want to initiate a password reset process so I can regain access to my account.
+As a user who has forgotten their password, I want to be able to initiate the password reset process so that I can regain access to my account.
 ### Acceptance Criteria
-- A “Forgot password?” link is available on the login screen.
-- Clicking the link opens a form that requires entering an email.
-- If the email exists, the system sends a unique reset link.
-- The link leads to a form where the user sets a new password.
+- On the login page, there is a "Forgot password?" link.
+- After clicking the link, the user is taken to a form where they must provide their email address.
+- If the email address exists in the database, the system sends a message with a unique password reset link to it.
+- The link leads to a page where the user can set a new password.
 
 ### ID
 US-005
 ### Title
-Adding the first aquarium after registration
+Adding First Aquarium After Registration
 ### Description
-As a new user, right after registration, I want to be guided through
+As a new user, right after registration, I want to be guided through the process of adding my first aquarium so that I can immediately configure the system for my needs.
+### Acceptance Criteria
+- Immediately after first registration/login, the user sees a welcome screen with an aquarium addition form.
+- The form requires entering the aquarium name, description, and selecting type (e.g., SPS, LPS, Mixed).
+- After successfully adding the aquarium, the user is redirected to an empty dashboard assigned to that aquarium.
+
+### ID
+US-006
+### Title
+Adding Another Aquarium
+### Description
+As a user who already has one aquarium, I want to be able to add another one so that I can monitor multiple tanks simultaneously.
+### Acceptance Criteria
+- In the user interface (e.g., in the aquarium dropdown list or in profile settings), there is an "Add new aquarium" option.
+- The addition process is similar to adding the first aquarium (form with name, type, description).
+- The newly added aquarium appears on the aquarium selection list.
+
+### ID
+US-007
+### Title
+Editing Aquarium Data
+### Description
+As a user, I want to be able to edit information about my aquarium (name, type, description) so that the data is always current.
+### Acceptance Criteria
+- In the settings of a given aquarium, there is an "Edit" option.
+- After selecting it, the user sees a form filled with current data.
+- The user can modify the data and save changes.
+- Changes are reflected throughout the application.
+
+### ID
+US-008
+### Title
+Deleting Aquarium
+### Description
+As a user, I want to be able to delete an aquarium along with all its measurement history if I no longer maintain it.
+### Acceptance Criteria
+- In the settings of a given aquarium, there is a "Delete" option.
+- The system asks for confirmation of the operation, informing that it is irreversible.
+- After confirmation, the aquarium and all associated measurements are permanently deleted from the database.
+
+### ID
+US-009
+### Title
+Adding New Measurement
+### Description
+As an aquarist, I want to easily enter the results of my latest water tests to save them in the system and subject them to analysis.
+### Acceptance Criteria
+- On the dashboard, there is a clearly visible "Add measurement" button.
+- After clicking, a form appears with fields for 7 key parameters (SG, kH, Ca, Mg, PO4, NO3, Temp).
+- Form fields accept only numeric values.
+- After saving, the new measurement becomes the "last measurement" and is displayed on the dashboard.
+- The measurement is saved in the database with the current timestamp.
+
+### ID
+US-010
+### Title
+Editing Existing Measurement
+### Description
+As a user who made a mistake while entering data, I want to be able to edit a specific measurement entry to correct the error.
+### Acceptance Criteria
+- In the historical measurement view (e.g., after selecting it from the calendar), there is an "Edit" option.
+- The user can modify the parameter values for the selected entry.
+- After saving changes, the dashboard and history reflect the updated data.
+
+### ID
+US-011
+### Title
+Deleting Existing Measurement
+### Description
+As a user, I want to be able to delete an incorrectly added measurement entry so that it does not disturb my data history.
+### Acceptance Criteria
+- In the historical measurement view, there is a "Delete" option.
+- The system asks for confirmation of deleting the entry.
+- After confirmation, the selected measurement entry is permanently deleted from the database.
+
+### ID
+US-012
+### Title
+Viewing Latest Measurement on Dashboard
+### Description
+As a user, after logging in, I want to immediately see on the dashboard the results of my latest measurement along with their visual assessment, so that I can quickly evaluate the aquarium's condition.
+### Acceptance Criteria
+- The dashboard loads the last measurement data for the active aquarium by default.
+- Each parameter is displayed in a separate panel.
+- The panel shows the current value, target value, and color-coded status indicator (green/orange/red).
+- If there are no measurements, a message is displayed with a "Add your first measurement" button.
+
+### ID
+US-013
+### Title
+Obtaining AI Analysis and Recommendations
+### Description
+As a user who noticed a parameter deviation from the norm, I want to get more information about potential causes and suggested actions by clicking on a given parameter panel.
+### Acceptance Criteria
+- Clicking on any parameter panel on the dashboard expands an additional view.
+- This view contains textual analysis generated by AI, describing the significance of the deviation.
+- The view contains general corrective suggestions.
+- Below the suggestions, a disclaimer about user responsibility is visible.
+
+### ID
+US-014
+### Title
+Navigation Through Measurement History
+### Description
+As an engaged hobbyist, I want to be able to browse measurements from previous days to analyze trends and changes in my aquarium.
+### Acceptance Criteria
+- On the dashboard, there is an interactive calendar.
+- Days on which measurements were taken are marked in the calendar.
+- Clicking on a marked day in the calendar loads and displays measurement data from that day on the dashboard.
+
+### ID
+US-015
+### Title
+Switching Between Aquariums
+### Description
+As a user with multiple aquariums, I want to easily switch between their dashboards to monitor each tank separately.
+### Acceptance Criteria
+- At the top of the dashboard, there is a dropdown list with the names of all user's aquariums.
+- Selecting an aquarium from the list refreshes the dashboard and displays data for the selected tank.
+- The user's selection is remembered during the session.
+
+### ID
+US-016
+### Title
+Personalizing Optimal Parameter Values
+### Description
+As an advanced user, I want to be able to customize the default optimal parameter values for my aquarium to match them to the specific needs of my stock.
+### Acceptance Criteria
+- In aquarium settings, there is a "Target parameters" section.
+- The user sees a list of 7 parameters with their currently set optimal values.
+- The user can edit these values and save changes.
+- These changes are immediately taken into account when assessing parameter status on the dashboard.
+
+## 6. Success Metrics
+The success of the MVP version will be measured using two key indicators, monitored through direct queries to the application database.
+
+### Adoption
+- Goal: 90% of registered users have at least one fully configured aquarium (with name and type) in the system.
+- Measurement method: SQL query comparing the number of users with at least one aquarium to the total number of registered users.
+
+### Retention
+- Goal: 75% of active users (logging in at least once a week) add new measurements at least once a week.
+- Measurement method: SQL query analyzing timestamps of added measurements for each user at specified time intervals.
+
