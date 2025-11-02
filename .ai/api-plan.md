@@ -1,1062 +1,1027 @@
-# REST API Plan for ReefMetrics
+# REST API Plan
 
 ## 1. Resources
 
 | Resource | Database Table | Description |
 |----------|---------------|-------------|
-| Aquarium Types | `aquarium_types` | Pre-populated categories of marine aquariums (read-only) |
-| Parameters | `parameters` | Pre-populated water parameters tracked by the app (read-only) |
+| Aquarium Types | `aquarium_types` | Pre-populated aquarium categories (LPS, SPS, Fish Only, Mixed) |
+| Parameters | `parameters` | Pre-populated water parameters (SG, kH, Ca, Mg, PO4, NO3, Temperature) |
+| Default Optimal Values | `default_optimal_values` | Pre-populated optimal parameter ranges for each aquarium type |
 | Aquariums | `aquariums` | User-owned aquariums |
 | Measurements | `measurements` | Water parameter measurements for aquariums |
-| Default Optimal Values | `default_optimal_values` | Pre-populated optimal ranges for parameters by aquarium type (read-only) |
-| Dashboard | Computed from `measurements` and `default_optimal_values` | Dashboard data with status indicators |
-| AI Analysis | External AI service integration | Parameter analysis and recommendations |
+| AI Recommendations | N/A (computed on-demand) | AI-generated recommendations for parameter deviations |
 
 ## 2. Endpoints
 
-### 2.1 Aquarium Types
+### 2.1 Authentication
 
-#### GET /api/aquarium-types
-
-Retrieve all available aquarium types.
-
-**Query Parameters:** None
-
-**Request Headers:**
+#### Sign Up
+- **Method**: `POST`
+- **Path**: `/api/auth/signup`
+- **Description**: Create a new user account
+- **Request Body**:
+```json
+{
+  "email": "string (required, valid email format)",
+  "password": "string (required, min 8 characters)",
+  "confirmPassword": "string (required, must match password)"
+}
 ```
-Authorization: Bearer {jwt_token}
+- **Response** (201 Created):
+```json
+{
+  "user": {
+    "id": "uuid",
+    "email": "string"
+  },
+  "session": {
+    "access_token": "string",
+    "refresh_token": "string",
+    "expires_at": "number"
+  }
+}
 ```
+- **Error Responses**:
+  - `400 Bad Request`: Invalid email format, passwords don't match, or password too weak
+  - `409 Conflict`: Email already exists
 
-**Response (200 OK):**
+#### Sign In
+- **Method**: `POST`
+- **Path**: `/api/auth/signin`
+- **Description**: Authenticate existing user
+- **Request Body**:
+```json
+{
+  "email": "string (required)",
+  "password": "string (required)"
+}
+```
+- **Response** (200 OK):
+```json
+{
+  "user": {
+    "id": "uuid",
+    "email": "string"
+  },
+  "session": {
+    "access_token": "string",
+    "refresh_token": "string",
+    "expires_at": "number"
+  }
+}
+```
+- **Error Responses**:
+  - `400 Bad Request`: Missing email or password
+  - `401 Unauthorized`: Invalid credentials
+
+#### Sign Out
+- **Method**: `POST`
+- **Path**: `/api/auth/signout`
+- **Description**: End user session
+- **Request Body**: None (uses session token from cookies/headers)
+- **Response** (204 No Content): Empty response
+- **Error Responses**:
+  - `401 Unauthorized`: No valid session
+
+#### Request Password Reset
+- **Method**: `POST`
+- **Path**: `/api/auth/reset-password`
+- **Description**: Request password reset email
+- **Request Body**:
+```json
+{
+  "email": "string (required)"
+}
+```
+- **Response** (200 OK):
+```json
+{
+  "message": "If the email exists, a password reset link has been sent"
+}
+```
+- **Error Responses**:
+  - `400 Bad Request`: Invalid email format
+
+#### Update Password
+- **Method**: `POST`
+- **Path**: `/api/auth/update-password`
+- **Description**: Update password using reset token
+- **Request Body**:
+```json
+{
+  "token": "string (required)",
+  "password": "string (required, min 8 characters)",
+  "confirmPassword": "string (required, must match password)"
+}
+```
+- **Response** (200 OK):
+```json
+{
+  "message": "Password updated successfully"
+}
+```
+- **Error Responses**:
+  - `400 Bad Request`: Invalid token, passwords don't match, or password too weak
+  - `401 Unauthorized`: Expired or invalid token
+
+### 2.2 Aquarium Types (Read-only reference data)
+
+#### List All Aquarium Types
+- **Method**: `GET`
+- **Path**: `/api/aquarium-types`
+- **Description**: Get all available aquarium types
+- **Query Parameters**: None
+- **Response** (200 OK):
 ```json
 {
   "data": [
     {
       "id": "uuid",
-      "name": "SPS",
-      "description": "Small Polyp Stony corals require stable water parameters"
-    },
-    {
-      "id": "uuid",
-      "name": "LPS",
-      "description": "Large Polyp Stony corals are more forgiving"
+      "name": "string",
+      "description": "string | null",
+      "created_at": "timestamp"
     }
   ]
 }
 ```
+- **Error Responses**:
+  - `401 Unauthorized`: User not authenticated
 
-**Error Responses:**
-- `401 Unauthorized`: Missing or invalid authentication token
-
----
-
-#### GET /api/aquarium-types/:id
-
-Retrieve a specific aquarium type by ID.
-
-**Path Parameters:**
-- `id` (UUID): Aquarium type identifier
-
-**Request Headers:**
-```
-Authorization: Bearer {jwt_token}
-```
-
-**Response (200 OK):**
+#### Get Single Aquarium Type
+- **Method**: `GET`
+- **Path**: `/api/aquarium-types/:id`
+- **Description**: Get details of a specific aquarium type
+- **Response** (200 OK):
 ```json
 {
   "data": {
     "id": "uuid",
-    "name": "SPS",
-    "description": "Small Polyp Stony corals require stable water parameters"
+    "name": "string",
+    "description": "string | null",
+    "created_at": "timestamp"
   }
 }
 ```
+- **Error Responses**:
+  - `401 Unauthorized`: User not authenticated
+  - `404 Not Found`: Aquarium type not found
 
-**Error Responses:**
-- `401 Unauthorized`: Missing or invalid authentication token
-- `404 Not Found`: Aquarium type not found
+### 2.3 Parameters (Read-only reference data)
 
----
-
-#### GET /api/aquarium-types/:name/optimal-values
-
-Retrieve default optimal parameter values for a specific aquarium type.
-
-**Path Parameters:**
-- `name` (string): Aquarium type name (e.g., "SPS", "LPS")
-
-**Request Headers:**
-```
-Authorization: Bearer {jwt_token}
-```
-
-**Response (200 OK):**
+#### List All Parameters
+- **Method**: `GET`
+- **Path**: `/api/parameters`
+- **Description**: Get all available water parameters
+- **Query Parameters**: None
+- **Response** (200 OK):
 ```json
 {
   "data": [
     {
       "id": "uuid",
-      "parameter": {
-        "id": "uuid",
-        "name": "Salinity",
-        "unit": "SG"
-      },
-      "min_value": 1.024,
-      "max_value": 1.026
-    },
-    {
-      "id": "uuid",
-      "parameter": {
-        "id": "uuid",
-        "name": "Calcium",
-        "unit": "ppm"
-      },
-      "min_value": 400,
-      "max_value": 450
+      "name": "string",
+      "full_name": "string",
+      "unit": "string",
+      "description": "string | null"
     }
   ]
 }
 ```
+- **Error Responses**:
+  - `401 Unauthorized`: User not authenticated
 
-**Error Responses:**
-- `401 Unauthorized`: Missing or invalid authentication token
-- `404 Not Found`: Aquarium type not found (invalid name)
-
----
-
-### 2.3 Parameters
-
-#### GET /api/parameters
-
-Retrieve all available water parameters.
-
-**Query Parameters:** None
-
-**Request Headers:**
+#### Get Single Parameter
+- **Method**: `GET`
+- **Path**: `/api/parameters/:id`
+- **Description**: Get details of a specific parameter
+- **Response** (200 OK):
+```json
+{
+  "data": {
+    "id": "uuid",
+    "name": "string",
+    "full_name": "string",
+    "unit": "string",
+    "description": "string | null"
+  }
+}
 ```
-Authorization: Bearer {jwt_token}
-```
+- **Error Responses**:
+  - `401 Unauthorized`: User not authenticated
+  - `404 Not Found`: Parameter not found
 
-**Response (200 OK):**
+### 2.4 Default Optimal Values (Read-only reference data)
+
+#### List Default Optimal Values
+- **Method**: `GET`
+- **Path**: `/api/default-optimal-values`
+- **Description**: Get default optimal parameter values
+- **Query Parameters**:
+  - `aquarium_type_id` (optional): Filter by aquarium type
+  - `parameter_id` (optional): Filter by parameter
+- **Response** (200 OK):
 ```json
 {
   "data": [
     {
       "id": "uuid",
-      "name": "Salinity",
-      "unit": "SG"
-    },
-    {
-      "id": "uuid",
-      "name": "Calcium",
-      "unit": "ppm"
-    },
-    {
-      "id": "uuid",
-      "name": "Alkalinity",
-      "unit": "dKH"
+      "aquarium_type_id": "uuid",
+      "parameter_id": "uuid",
+      "min_value": "number",
+      "max_value": "number",
+      "aquarium_type": {
+        "name": "string"
+      },
+      "parameter": {
+        "name": "string",
+        "unit": "string"
+      }
     }
   ]
 }
 ```
+- **Error Responses**:
+  - `401 Unauthorized`: User not authenticated
+  - `400 Bad Request`: Invalid query parameters
 
-**Error Responses:**
-- `401 Unauthorized`: Missing or invalid authentication token
-
----
-
-### 2.4 Aquariums
-
-#### GET /api/aquariums
-
-Retrieve all aquariums for the authenticated user.
-
-**Query Parameters:**
-- `limit` (number, optional): Number of results per page (default: 50, max: 100)
-- `offset` (number, optional): Number of results to skip (default: 0)
-
-**Request Headers:**
-```
-Authorization: Bearer {jwt_token}
-```
-
-**Response (200 OK):**
+#### Get Default Optimal Values for Aquarium Type
+- **Method**: `GET`
+- **Path**: `/api/aquarium-types/:aquariumTypeId/optimal-values`
+- **Description**: Get all default optimal values for a specific aquarium type
+- **Response** (200 OK):
 ```json
 {
   "data": [
     {
       "id": "uuid",
-      "name": "Main Reef Tank",
-      "description": "150 gallon SPS dominated reef",
+      "parameter_id": "uuid",
+      "min_value": "number",
+      "max_value": "number",
+      "parameter": {
+        "name": "string",
+        "full_name": "string",
+        "unit": "string"
+      }
+    }
+  ]
+}
+```
+- **Error Responses**:
+  - `401 Unauthorized`: User not authenticated
+  - `404 Not Found`: Aquarium type not found
+
+### 2.5 Aquariums
+
+#### List User's Aquariums
+- **Method**: `GET`
+- **Path**: `/api/aquariums`
+- **Description**: Get all aquariums belonging to the authenticated user
+- **Query Parameters**:
+  - `sort` (optional): Sort field (name, created_at) - default: created_at
+  - `order` (optional): Sort order (asc, desc) - default: desc
+- **Response** (200 OK):
+```json
+{
+  "data": [
+    {
+      "id": "uuid",
+      "user_id": "uuid",
+      "aquarium_type_id": "uuid",
+      "name": "string",
+      "description": "string | null",
+      "volume": "number | null",
+      "created_at": "timestamp",
+      "updated_at": "timestamp",
       "aquarium_type": {
         "id": "uuid",
-        "name": "SPS",
-        "description": "Small Polyp Stony corals"
-      },
-      "created_at": "2025-10-27T10:30:00Z"
+        "name": "string"
+      }
     }
-  ],
-  "pagination": {
-    "limit": 50,
-    "offset": 0,
-    "total": 1
-  }
+  ]
 }
 ```
+- **Error Responses**:
+  - `401 Unauthorized`: User not authenticated
+  - `400 Bad Request`: Invalid query parameters
 
-**Error Responses:**
-- `401 Unauthorized`: Missing or invalid authentication token
-
----
-
-#### GET /api/aquariums/:id
-
-Retrieve a specific aquarium by ID.
-
-**Path Parameters:**
-- `id` (UUID): Aquarium identifier
-
-**Request Headers:**
-```
-Authorization: Bearer {jwt_token}
-```
-
-**Response (200 OK):**
+#### Get Single Aquarium
+- **Method**: `GET`
+- **Path**: `/api/aquariums/:id`
+- **Description**: Get details of a specific aquarium
+- **Response** (200 OK):
 ```json
 {
   "data": {
     "id": "uuid",
-    "name": "Main Reef Tank",
-    "description": "150 gallon SPS dominated reef",
+    "user_id": "uuid",
+    "aquarium_type_id": "uuid",
+    "name": "string",
+    "description": "string | null",
+    "volume": "number | null",
+    "created_at": "timestamp",
+    "updated_at": "timestamp",
     "aquarium_type": {
       "id": "uuid",
-      "name": "SPS",
-      "description": "Small Polyp Stony corals"
-    },
-    "created_at": "2025-10-27T10:30:00Z"
-  }
-}
-```
-
-**Error Responses:**
-- `401 Unauthorized`: Missing or invalid authentication token
-- `404 Not Found`: Aquarium not found or doesn't belong to user
-
----
-
-#### POST /api/aquariums
-
-Create a new aquarium for the authenticated user.
-
-**Request Headers:**
-```
-Authorization: Bearer {jwt_token}
-Content-Type: application/json
-```
-
-**Request Body:**
-```json
-{
-  "name": "Main Reef Tank",
-  "description": "150 gallon SPS dominated reef",
-  "aquarium_type_id": "uuid"
-}
-```
-
-**Validation Rules:**
-- `name`: Required, string, non-empty
-- `description`: Optional, string, max 255 characters
-- `aquarium_type_id`: Required, valid UUID, must exist in aquarium_types
-
-**Response (201 Created):**
-```json
-{
-  "data": {
-    "id": "uuid",
-    "name": "Main Reef Tank",
-    "description": "150 gallon SPS dominated reef",
-    "aquarium_type": {
-      "id": "uuid",
-      "name": "SPS",
-      "description": "Small Polyp Stony corals"
-    },
-    "created_at": "2025-10-27T10:30:00Z"
-  }
-}
-```
-
-**Error Responses:**
-- `401 Unauthorized`: Missing or invalid authentication token
-- `400 Bad Request`: Validation errors
-  ```json
-  {
-    "error": {
-      "message": "Validation failed",
-      "details": [
-        {
-          "field": "name",
-          "message": "Name is required"
-        }
-      ]
+      "name": "string",
+      "description": "string | null"
     }
   }
-  ```
-- `404 Not Found`: Aquarium type not found
-
----
-
-#### PATCH /api/aquariums/:id
-
-Update an existing aquarium.
-
-**Path Parameters:**
-- `id` (UUID): Aquarium identifier
-
-**Request Headers:**
-```
-Authorization: Bearer {jwt_token}
-Content-Type: application/json
-```
-
-**Request Body:**
-```json
-{
-  "name": "Updated Tank Name",
-  "description": "Updated description",
-  "aquarium_type_id": "uuid"
 }
 ```
+- **Error Responses**:
+  - `401 Unauthorized`: User not authenticated
+  - `403 Forbidden`: Aquarium belongs to another user
+  - `404 Not Found`: Aquarium not found
 
-**Validation Rules:**
-- All fields are optional
-- `name`: String, non-empty if provided
-- `description`: String, max 255 characters if provided
-- `aquarium_type_id`: Valid UUID, must exist in aquarium_types if provided
-
-**Response (200 OK):**
+#### Create Aquarium
+- **Method**: `POST`
+- **Path**: `/api/aquariums`
+- **Description**: Create a new aquarium for the authenticated user
+- **Request Body**:
+```json
+{
+  "name": "string (required, min 1 char)",
+  "aquarium_type_id": "uuid (required)",
+  "description": "string (optional)",
+  "volume": "number (optional, positive)"
+}
+```
+- **Response** (201 Created):
 ```json
 {
   "data": {
     "id": "uuid",
-    "name": "Updated Tank Name",
-    "description": "Updated description",
-    "aquarium_type": {
-      "id": "uuid",
-      "name": "SPS",
-      "description": "Small Polyp Stony corals"
-    },
-    "created_at": "2025-10-27T10:30:00Z"
+    "user_id": "uuid",
+    "aquarium_type_id": "uuid",
+    "name": "string",
+    "description": "string | null",
+    "volume": "number | null",
+    "created_at": "timestamp",
+    "updated_at": "timestamp"
   }
 }
 ```
+- **Error Responses**:
+  - `401 Unauthorized`: User not authenticated
+  - `400 Bad Request`: Invalid data or validation error
+  - `409 Conflict`: Aquarium with this name already exists for the user
+  - `404 Not Found`: Aquarium type not found
 
-**Error Responses:**
-- `401 Unauthorized`: Missing or invalid authentication token
-- `404 Not Found`: Aquarium not found or doesn't belong to user
-- `400 Bad Request`: Validation errors
-
----
-
-#### DELETE /api/aquariums/:id
-
-Delete an aquarium and all associated measurements.
-
-**Path Parameters:**
-- `id` (UUID): Aquarium identifier
-
-**Request Headers:**
+#### Update Aquarium
+- **Method**: `PATCH`
+- **Path**: `/api/aquariums/:id`
+- **Description**: Update an existing aquarium
+- **Request Body** (all fields optional):
+```json
+{
+  "name": "string (min 1 char)",
+  "aquarium_type_id": "uuid",
+  "description": "string",
+  "volume": "number (positive)"
+}
 ```
-Authorization: Bearer {jwt_token}
+- **Response** (200 OK):
+```json
+{
+  "data": {
+    "id": "uuid",
+    "user_id": "uuid",
+    "aquarium_type_id": "uuid",
+    "name": "string",
+    "description": "string | null",
+    "volume": "number | null",
+    "created_at": "timestamp",
+    "updated_at": "timestamp"
+  }
+}
 ```
+- **Error Responses**:
+  - `401 Unauthorized`: User not authenticated
+  - `403 Forbidden`: Aquarium belongs to another user
+  - `404 Not Found`: Aquarium not found
+  - `400 Bad Request`: Invalid data or validation error
+  - `409 Conflict`: Aquarium with this name already exists for the user
 
-**Response (204 No Content)**
+#### Delete Aquarium
+- **Method**: `DELETE`
+- **Path**: `/api/aquariums/:id`
+- **Description**: Delete an aquarium and all its measurements
+- **Response** (204 No Content): Empty response
+- **Error Responses**:
+  - `401 Unauthorized`: User not authenticated
+  - `403 Forbidden`: Aquarium belongs to another user
+  - `404 Not Found`: Aquarium not found
 
-**Error Responses:**
-- `401 Unauthorized`: Missing or invalid authentication token
-- `404 Not Found`: Aquarium not found or doesn't belong to user
+### 2.6 Measurements
 
----
-
-### 2.5 Measurements
-
-#### GET /api/aquariums/:aquariumId/measurements
-
-Retrieve measurements for a specific aquarium.
-
-**Path Parameters:**
-- `aquariumId` (UUID): Aquarium identifier
-
-**Query Parameters:**
-- `parameter_id` (UUID, optional): Filter by specific parameter
-- `date` (YYYY-MM-DD, optional): Filter by specific date
-- `from` (YYYY-MM-DD, optional): Start date for range query
-- `to` (YYYY-MM-DD, optional): End date for range query
-- `limit` (number, optional): Number of results per page (default: 50, max: 100)
-- `offset` (number, optional): Number of results to skip (default: 0)
-- `sort` (string, optional): Sort order, either `asc` or `desc` (default: `desc`)
-
-**Request Headers:**
-```
-Authorization: Bearer {jwt_token}
-```
-
-**Response (200 OK):**
+#### List Measurements for Aquarium
+- **Method**: `GET`
+- **Path**: `/api/aquariums/:aquariumId/measurements`
+- **Description**: Get measurements for a specific aquarium with filtering and pagination
+- **Query Parameters**:
+  - `start_date` (optional): Filter measurements from this date (ISO 8601)
+  - `end_date` (optional): Filter measurements to this date (ISO 8601)
+  - `parameter_id` (optional): Filter by specific parameter
+  - `limit` (optional): Number of results per page (default: 50, max: 200)
+  - `offset` (optional): Number of results to skip (default: 0)
+  - `sort` (optional): Sort field (measurement_time) - default: measurement_time
+  - `order` (optional): Sort order (asc, desc) - default: desc
+- **Response** (200 OK):
 ```json
 {
   "data": [
     {
       "id": "uuid",
+      "aquarium_id": "uuid",
+      "parameter_id": "uuid",
+      "value": "number",
+      "measurement_time": "timestamp",
+      "notes": "string | null",
+      "created_at": "timestamp",
       "parameter": {
-        "id": "uuid",
-        "name": "Salinity",
-        "unit": "SG"
-      },
-      "value": 1.025,
-      "created_at": "2025-10-27T14:30:00Z"
-    },
-    {
-      "id": "uuid",
-      "parameter": {
-        "id": "uuid",
-        "name": "Calcium",
-        "unit": "ppm"
-      },
-      "value": 420,
-      "created_at": "2025-10-27T14:30:00Z"
+        "name": "string",
+        "full_name": "string",
+        "unit": "string"
+      }
     }
   ],
   "pagination": {
-    "limit": 50,
-    "offset": 0,
-    "total": 14
+    "total": "number",
+    "limit": "number",
+    "offset": "number"
   }
 }
 ```
+- **Error Responses**:
+  - `401 Unauthorized`: User not authenticated
+  - `403 Forbidden`: Aquarium belongs to another user
+  - `404 Not Found`: Aquarium not found
+  - `400 Bad Request`: Invalid query parameters
 
-**Error Responses:**
-- `401 Unauthorized`: Missing or invalid authentication token
-- `404 Not Found`: Aquarium not found or doesn't belong to user
-- `400 Bad Request`: Invalid query parameters
-
----
-
-#### GET /api/aquariums/:aquariumId/measurements/:id
-
-Retrieve a specific measurement by ID.
-
-**Path Parameters:**
-- `aquariumId` (UUID): Aquarium identifier
-- `id` (UUID): Measurement identifier
-
-**Request Headers:**
+#### Get Latest Measurements for Aquarium
+- **Method**: `GET`
+- **Path**: `/api/aquariums/:aquariumId/measurements/latest`
+- **Description**: Get the most recent measurement for each parameter
+- **Response** (200 OK):
+```json
+{
+  "data": [
+    {
+      "id": "uuid",
+      "aquarium_id": "uuid",
+      "parameter_id": "uuid",
+      "value": "number",
+      "measurement_time": "timestamp",
+      "notes": "string | null",
+      "created_at": "timestamp",
+      "parameter": {
+        "id": "uuid",
+        "name": "string",
+        "full_name": "string",
+        "unit": "string"
+      }
+    }
+  ]
+}
 ```
-Authorization: Bearer {jwt_token}
-```
+- **Error Responses**:
+  - `401 Unauthorized`: User not authenticated
+  - `403 Forbidden`: Aquarium belongs to another user
+  - `404 Not Found`: Aquarium not found
 
-**Response (200 OK):**
+#### Get Measurements by Date
+- **Method**: `GET`
+- **Path**: `/api/aquariums/:aquariumId/measurements/by-date/:date`
+- **Description**: Get all measurements for a specific date (YYYY-MM-DD)
+- **Response** (200 OK):
+```json
+{
+  "data": [
+    {
+      "id": "uuid",
+      "aquarium_id": "uuid",
+      "parameter_id": "uuid",
+      "value": "number",
+      "measurement_time": "timestamp",
+      "notes": "string | null",
+      "created_at": "timestamp",
+      "parameter": {
+        "name": "string",
+        "full_name": "string",
+        "unit": "string"
+      }
+    }
+  ]
+}
+```
+- **Error Responses**:
+  - `401 Unauthorized`: User not authenticated
+  - `403 Forbidden`: Aquarium belongs to another user
+  - `404 Not Found`: Aquarium not found
+  - `400 Bad Request`: Invalid date format
+
+#### Get Measurement Dates Calendar
+- **Method**: `GET`
+- **Path**: `/api/aquariums/:aquariumId/measurements/calendar`
+- **Description**: Get list of dates that have measurements for calendar display
+- **Query Parameters**:
+  - `year` (optional): Filter by year (default: current year)
+  - `month` (optional): Filter by month (1-12)
+- **Response** (200 OK):
+```json
+{
+  "data": [
+    {
+      "date": "YYYY-MM-DD",
+      "measurement_count": "number"
+    }
+  ]
+}
+```
+- **Error Responses**:
+  - `401 Unauthorized`: User not authenticated
+  - `403 Forbidden`: Aquarium belongs to another user
+  - `404 Not Found`: Aquarium not found
+  - `400 Bad Request`: Invalid query parameters
+
+#### Get Single Measurement
+- **Method**: `GET`
+- **Path**: `/api/measurements/:id`
+- **Description**: Get details of a specific measurement
+- **Response** (200 OK):
 ```json
 {
   "data": {
     "id": "uuid",
+    "aquarium_id": "uuid",
+    "parameter_id": "uuid",
+    "value": "number",
+    "measurement_time": "timestamp",
+    "notes": "string | null",
+    "created_at": "timestamp",
     "parameter": {
-      "id": "uuid",
-      "name": "Salinity",
-      "unit": "SG"
-    },
-    "value": 1.025,
-    "created_at": "2025-10-27T14:30:00Z"
+      "name": "string",
+      "full_name": "string",
+      "unit": "string"
+    }
   }
 }
 ```
+- **Error Responses**:
+  - `401 Unauthorized`: User not authenticated
+  - `403 Forbidden`: Measurement belongs to another user's aquarium
+  - `404 Not Found`: Measurement not found
 
-**Error Responses:**
-- `401 Unauthorized`: Missing or invalid authentication token
-- `404 Not Found`: Measurement or aquarium not found
-
----
-
-#### POST /api/aquariums/:aquariumId/measurements
-
-Create one or more measurements for an aquarium.
-
-**Path Parameters:**
-- `aquariumId` (UUID): Aquarium identifier
-
-**Request Headers:**
-```
-Authorization: Bearer {jwt_token}
-Content-Type: application/json
-```
-
-**Request Body (Single Measurement):**
+#### Create Measurement
+- **Method**: `POST`
+- **Path**: `/api/aquariums/:aquariumId/measurements`
+- **Description**: Create a new measurement for an aquarium
+- **Request Body**:
 ```json
 {
-  "parameter_id": "uuid",
-  "value": 1.025
+  "parameter_id": "uuid (required)",
+  "value": "number (required, >= 0)",
+  "measurement_time": "timestamp (optional, defaults to now)",
+  "notes": "string (optional)"
 }
 ```
-
-**Request Body (Multiple Measurements - Batch):**
+- **Response** (201 Created):
 ```json
 {
+  "data": {
+    "id": "uuid",
+    "aquarium_id": "uuid",
+    "parameter_id": "uuid",
+    "value": "number",
+    "measurement_time": "timestamp",
+    "notes": "string | null",
+    "created_at": "timestamp"
+  }
+}
+```
+- **Error Responses**:
+  - `401 Unauthorized`: User not authenticated
+  - `403 Forbidden`: Aquarium belongs to another user
+  - `404 Not Found`: Aquarium or parameter not found
+  - `400 Bad Request`: Invalid data or validation error (e.g., negative value)
+
+#### Bulk Create Measurements
+- **Method**: `POST`
+- **Path**: `/api/aquariums/:aquariumId/measurements/bulk`
+- **Description**: Create multiple measurements at once (for entering a full test set)
+- **Request Body**:
+```json
+{
+  "measurement_time": "timestamp (optional, defaults to now)",
   "measurements": [
     {
-      "parameter_id": "uuid",
-      "value": 1.025
-    },
-    {
-      "parameter_id": "uuid",
-      "value": 420
+      "parameter_id": "uuid (required)",
+      "value": "number (required, >= 0)",
+      "notes": "string (optional)"
     }
   ]
 }
 ```
-
-**Validation Rules:**
-- `parameter_id`: Required, valid UUID, must exist in parameters
-- `value`: Required, numeric, precision NUMERIC(8,4)
-- For batch: all measurements validated individually
-
-**Response (201 Created):**
-
-For single measurement:
-```json
-{
-  "data": {
-    "id": "uuid",
-    "parameter": {
-      "id": "uuid",
-      "name": "Salinity",
-      "unit": "SG"
-    },
-    "value": 1.025,
-    "created_at": "2025-10-27T14:30:00Z"
-  }
-}
-```
-
-For batch measurements:
+- **Response** (201 Created):
 ```json
 {
   "data": [
     {
       "id": "uuid",
-      "parameter": {
-        "id": "uuid",
-        "name": "Salinity",
-        "unit": "SG"
-      },
-      "value": 1.025,
-      "created_at": "2025-10-27T14:30:00Z"
-    },
-    {
-      "id": "uuid",
-      "parameter": {
-        "id": "uuid",
-        "name": "Calcium",
-        "unit": "ppm"
-      },
-      "value": 420,
-      "created_at": "2025-10-27T14:30:00Z"
+      "aquarium_id": "uuid",
+      "parameter_id": "uuid",
+      "value": "number",
+      "measurement_time": "timestamp",
+      "notes": "string | null",
+      "created_at": "timestamp"
     }
   ]
 }
 ```
+- **Error Responses**:
+  - `401 Unauthorized`: User not authenticated
+  - `403 Forbidden`: Aquarium belongs to another user
+  - `404 Not Found`: Aquarium or parameter not found
+  - `400 Bad Request`: Invalid data or validation error
 
-**Error Responses:**
-- `401 Unauthorized`: Missing or invalid authentication token
-- `404 Not Found`: Aquarium or parameter not found
-- `400 Bad Request`: Validation errors
-  ```json
-  {
-    "error": {
-      "message": "Validation failed",
-      "details": [
-        {
-          "field": "value",
-          "message": "Value must be a number"
-        }
-      ]
-    }
-  }
-  ```
-
----
-
-#### PATCH /api/aquariums/:aquariumId/measurements/:id
-
-Update an existing measurement.
-
-**Path Parameters:**
-- `aquariumId` (UUID): Aquarium identifier
-- `id` (UUID): Measurement identifier
-
-**Request Headers:**
-```
-Authorization: Bearer {jwt_token}
-Content-Type: application/json
-```
-
-**Request Body:**
+#### Update Measurement
+- **Method**: `PATCH`
+- **Path**: `/api/measurements/:id`
+- **Description**: Update an existing measurement
+- **Request Body** (all fields optional):
 ```json
 {
-  "value": 1.026
+  "value": "number (>= 0)",
+  "measurement_time": "timestamp",
+  "notes": "string"
 }
 ```
-
-**Validation Rules:**
-- `value`: Required, numeric, precision NUMERIC(8,4)
-
-**Response (200 OK):**
+- **Response** (200 OK):
 ```json
 {
   "data": {
     "id": "uuid",
-    "parameter": {
-      "id": "uuid",
-      "name": "Salinity",
-      "unit": "SG"
-    },
-    "value": 1.026,
-    "created_at": "2025-10-27T14:30:00Z"
+    "aquarium_id": "uuid",
+    "parameter_id": "uuid",
+    "value": "number",
+    "measurement_time": "timestamp",
+    "notes": "string | null",
+    "created_at": "timestamp"
   }
 }
 ```
+- **Error Responses**:
+  - `401 Unauthorized`: User not authenticated
+  - `403 Forbidden`: Measurement belongs to another user's aquarium
+  - `404 Not Found`: Measurement not found
+  - `400 Bad Request`: Invalid data or validation error
 
-**Error Responses:**
-- `401 Unauthorized`: Missing or invalid authentication token
-- `404 Not Found`: Measurement or aquarium not found
-- `400 Bad Request`: Validation errors
+#### Delete Measurement
+- **Method**: `DELETE`
+- **Path**: `/api/measurements/:id`
+- **Description**: Delete a measurement
+- **Response** (204 No Content): Empty response
+- **Error Responses**:
+  - `401 Unauthorized`: User not authenticated
+  - `403 Forbidden`: Measurement belongs to another user's aquarium
+  - `404 Not Found`: Measurement not found
 
----
+### 2.7 AI Recommendations
 
-#### DELETE /api/aquariums/:aquariumId/measurements/:id
-
-Delete a measurement.
-
-**Path Parameters:**
-- `aquariumId` (UUID): Aquarium identifier
-- `id` (UUID): Measurement identifier
-
-**Request Headers:**
+#### Get AI Recommendations for Parameter
+- **Method**: `POST`
+- **Path**: `/api/aquariums/:aquariumId/recommendations`
+- **Description**: Generate AI recommendations for parameter deviations
+- **Request Body**:
+```json
+{
+  "parameter_id": "uuid (required)",
+  "current_value": "number (required)",
+  "optimal_min": "number (required)",
+  "optimal_max": "number (required)"
+}
 ```
-Authorization: Bearer {jwt_token}
+- **Response** (200 OK):
+```json
+{
+  "data": {
+    "parameter": {
+      "id": "uuid",
+      "name": "string",
+      "full_name": "string",
+      "unit": "string"
+    },
+    "current_value": "number",
+    "optimal_range": {
+      "min": "number",
+      "max": "number"
+    },
+    "deviation_percentage": "number",
+    "status": "normal | warning | critical",
+    "analysis": "string",
+    "recommendations": [
+      "string"
+    ],
+    "disclaimer": "string"
+  }
+}
 ```
+- **Error Responses**:
+  - `401 Unauthorized`: User not authenticated
+  - `403 Forbidden`: Aquarium belongs to another user
+  - `404 Not Found`: Aquarium or parameter not found
+  - `400 Bad Request`: Invalid data
+  - `503 Service Unavailable`: AI service unavailable
 
-**Response (204 No Content)**
-
-**Error Responses:**
-- `401 Unauthorized`: Missing or invalid authentication token
-- `404 Not Found`: Measurement or aquarium not found
-
----
-
-### 2.6 Dashboard
-
-#### GET /api/aquariums/:aquariumId/dashboard
-
-Retrieve dashboard data with latest measurements and status indicators.
-
-**Path Parameters:**
-- `aquariumId` (UUID): Aquarium identifier
-
-**Request Headers:**
-```
-Authorization: Bearer {jwt_token}
-```
-
-**Response (200 OK):**
+#### Get Dashboard Analysis
+- **Method**: `GET`
+- **Path**: `/api/aquariums/:aquariumId/dashboard`
+- **Description**: Get complete dashboard data with latest measurements and status indicators
+- **Response** (200 OK):
 ```json
 {
   "data": {
     "aquarium": {
       "id": "uuid",
-      "name": "Main Reef Tank",
+      "name": "string",
+      "aquarium_type_id": "uuid",
       "aquarium_type": {
-        "id": "uuid",
-        "name": "SPS"
+        "name": "string"
       }
     },
+    "latest_measurement_time": "timestamp | null",
     "parameters": [
       {
         "parameter": {
           "id": "uuid",
-          "name": "Salinity",
-          "unit": "SG"
+          "name": "string",
+          "full_name": "string",
+          "unit": "string"
         },
-        "current_value": 1.025,
+        "current_value": "number | null",
         "optimal_range": {
-          "min": 1.024,
-          "max": 1.026
+          "min": "number",
+          "max": "number"
         },
-        "status": "optimal",
-        "deviation_percent": 0,
-        "last_measured_at": "2025-10-27T14:30:00Z"
-      },
-      {
-        "parameter": {
-          "id": "uuid",
-          "name": "Calcium",
-          "unit": "ppm"
-        },
-        "current_value": 380,
-        "optimal_range": {
-          "min": 400,
-          "max": 450
-        },
-        "status": "warning",
-        "deviation_percent": 12.5,
-        "last_measured_at": "2025-10-27T14:30:00Z"
-      },
-      {
-        "parameter": {
-          "id": "uuid",
-          "name": "Alkalinity",
-          "unit": "dKH"
-        },
-        "current_value": null,
-        "optimal_range": {
-          "min": 8.0,
-          "max": 12.0
-        },
-        "status": "no_data",
-        "deviation_percent": null,
-        "last_measured_at": null
+        "deviation_percentage": "number | null",
+        "status": "normal | warning | critical | no_data",
+        "measurement_time": "timestamp | null"
       }
     ]
   }
 }
 ```
-
-**Status Values:**
-- `optimal`: Deviation < 10%
-- `warning`: Deviation 10-20%
-- `critical`: Deviation > 20%
-- `no_data`: No measurements recorded for this parameter
-
-**Deviation Calculation:**
-```
-optimal_mid = (min + max) / 2
-deviation_percent = |(current_value - optimal_mid) / optimal_mid| * 100
-```
-
-**Error Responses:**
-- `401 Unauthorized`: Missing or invalid authentication token
-- `404 Not Found`: Aquarium not found or doesn't belong to user
-
----
-
-### 2.7 AI Analysis
-
-#### POST /api/aquariums/:aquariumId/parameters/:parameterId/analyze
-
-Request AI analysis and recommendations for a specific parameter.
-
-**Path Parameters:**
-- `aquariumId` (UUID): Aquarium identifier
-- `parameterId` (UUID): Parameter identifier
-
-**Request Headers:**
-```
-Authorization: Bearer {jwt_token}
-Content-Type: application/json
-```
-
-**Request Body:**
-```json
-{
-  "measurement_id": "uuid"
-}
-```
-
-**Validation Rules:**
-- `measurement_id`: Optional, valid UUID. If not provided, uses latest measurement
-
-**Response (200 OK):**
-```json
-{
-  "data": {
-    "parameter": {
-      "id": "uuid",
-      "name": "Calcium",
-      "unit": "ppm"
-    },
-    "measurement": {
-      "id": "uuid",
-      "value": 380,
-      "created_at": "2025-10-27T14:30:00Z"
-    },
-    "optimal_range": {
-      "min": 400,
-      "max": 450
-    },
-    "status": "warning",
-    "deviation_percent": 12.5,
-    "analysis": {
-      "summary": "Your calcium level is slightly below the optimal range for SPS corals.",
-      "recommendations": [
-        "Test your calcium again to confirm the reading",
-        "Consider dosing calcium chloride to raise levels gradually",
-        "Monitor alkalinity as well, as calcium and alkalinity are closely related",
-        "Ensure your calcium reactor is functioning properly if you use one"
-      ],
-      "warnings": [
-        "Do not raise calcium levels too quickly",
-        "Always maintain proper alkalinity when adjusting calcium"
-      ]
-    },
-    "disclaimer": "This analysis is provided as a recommendation only. Implementation of any suggested actions is solely your responsibility. Always research and verify recommendations before making changes to your aquarium.",
-    "generated_at": "2025-10-27T14:35:00Z"
-  }
-}
-```
-
-**Error Responses:**
-- `401 Unauthorized`: Missing or invalid authentication token
-- `404 Not Found`: Aquarium, parameter, or measurement not found
-- `429 Too Many Requests`: Rate limit exceeded (10 requests per minute per user)
-  ```json
-  {
-    "error": {
-      "message": "Rate limit exceeded",
-      "retry_after": 45
-    }
-  }
-  ```
-- `503 Service Unavailable`: AI service unavailable
-  ```json
-  {
-    "error": {
-      "message": "AI analysis service is temporarily unavailable"
-    }
-  }
-  ```
-
----
+- **Error Responses**:
+  - `401 Unauthorized`: User not authenticated
+  - `403 Forbidden`: Aquarium belongs to another user
+  - `404 Not Found`: Aquarium not found
 
 ## 3. Authentication and Authorization
 
-### 3.1 Authentication Mechanism
+### Authentication Mechanism
+The API uses **Supabase Auth** for authentication with session-based token management.
 
-ReefMetrics uses **Supabase Auth** for user authentication, which provides:
+#### Implementation Details
+1. **Session Tokens**: Supabase provides JWT access tokens and refresh tokens
+2. **Token Storage**: 
+   - Access tokens stored in HTTP-only cookies for web clients
+   - Tokens can also be passed via `Authorization: Bearer <token>` header
+3. **Token Refresh**: Automatic refresh token rotation handled by Supabase client
+4. **Session Duration**: Configurable (default: 1 hour for access tokens, 30 days for refresh tokens)
 
-- Email/password registration and login
-- JWT (JSON Web Token) based sessions
-- Password reset functionality
-- Secure session management
+#### Middleware Integration
+All API endpoints (except authentication endpoints) require authentication:
+- Astro middleware extracts and validates the session token
+- Supabase client is attached to `context.locals.supabase` with user context
+- Row-Level Security (RLS) policies ensure data isolation between users
 
-**Implementation Details:**
+### Authorization
 
-1. **Client-Side**: Use the Supabase JavaScript client to handle authentication flows
-2. **Server-Side**: Validate JWT tokens using Supabase's server-side utilities
-3. **Token Format**: `Authorization: Bearer {jwt_token}` header on all authenticated requests
-4. **Session Duration**: Tokens are valid for 1 hour, with automatic refresh handled by the Supabase client
+#### User-Level Authorization
+- All resource access is controlled by Supabase RLS policies
+- Users can only access their own data (aquariums, measurements)
+- Reference data (aquarium types, parameters, default optimal values) is read-only for all authenticated users
 
-### 3.2 Authorization (Row-Level Security)
+#### Resource Ownership Verification
+For endpoints accessing specific resources:
+1. Authentication verified by middleware
+2. RLS policies automatically filter results to user's data
+3. Additional authorization checks in API endpoints for explicit error messages
 
-All data access is controlled through **PostgreSQL Row-Level Security (RLS)** policies:
+### Security Measures
 
-**Aquariums Table:**
-- Users can only view, create, update, and delete their own aquariums
-- `user_id` is automatically set to `auth.uid()` on creation
-- All operations filtered by `WHERE auth.uid() = user_id`
+#### Rate Limiting
+- Implement rate limiting at the API gateway level
+- Suggested limits:
+  - Authentication endpoints: 5 requests per minute per IP
+  - Read endpoints: 100 requests per minute per user
+  - Write endpoints: 30 requests per minute per user
+  - AI recommendations: 10 requests per minute per user (due to external API costs)
 
-**Measurements Table:**
-- Users can only access measurements for aquariums they own
-- Enforced through JOIN with aquariums table checking `user_id`
-
-**Reference Tables (Read-Only):**
-- `aquarium_types`: Public read access
-- `parameters`: Public read access
-- `default_optimal_values`: Public read access
-
-**Implementation:**
-- RLS is enabled on all user-data tables
-- API endpoints use the Supabase client from `context.locals.supabase`
-- The client automatically includes the user's JWT, enforcing RLS policies
-- No manual user_id filtering needed in API code
-
-### 3.3 API Security Best Practices
-
-1. **HTTPS Only**: All API communication must use HTTPS in production
-2. **CORS Configuration**: Restrict CORS to frontend domain only
-3. **Input Sanitization**: Validate and sanitize all user inputs
-4. **Rate Limiting**: 
-   - General endpoints: 100 requests per minute per user
-   - AI analysis endpoints: 10 requests per minute per user
-5. **Error Messages**: Avoid exposing sensitive information in error messages
-
----
+#### Additional Security
+- HTTPS-only in production
+- CORS configuration limiting allowed origins
+- Input validation using Zod schemas
+- SQL injection prevention via parameterized queries (Supabase client)
+- XSS prevention through proper output encoding
+- CSRF protection via SameSite cookies
 
 ## 4. Validation and Business Logic
 
 ### 4.1 Validation Rules by Resource
 
 #### Aquariums
-
-| Field | Rules |
-|-------|-------|
-| `name` | Required, string, non-empty, max 255 characters |
-| `description` | Optional, string, max 255 characters |
-| `aquarium_type_id` | Required, valid UUID format, must exist in `aquarium_types` |
+- **name**: Required, minimum 1 character, maximum 255 characters
+- **aquarium_type_id**: Required, must be a valid UUID, must exist in `aquarium_types` table
+- **description**: Optional, maximum 1000 characters
+- **volume**: Optional, must be positive number if provided, maximum 99999.99
+- **Unique constraint**: `(user_id, name)` - user cannot have two aquariums with the same name
 
 #### Measurements
+- **parameter_id**: Required, must be a valid UUID, must exist in `parameters` table
+- **value**: Required, must be a number >= 0 (CHECK constraint in database)
+- **measurement_time**: Optional (defaults to current timestamp), must be valid timestamp, cannot be in the future
+- **notes**: Optional, maximum 1000 characters
+- **aquarium_id**: Must belong to the authenticated user (enforced by RLS)
 
-| Field | Rules |
-|-------|-------|
-| `parameter_id` | Required, valid UUID format, must exist in `parameters` |
-| `value` | Required, numeric, precision NUMERIC(8,4) (max 9999.9999) |
-| `aquarium_id` | Required (from path), valid UUID, must belong to authenticated user |
+#### Authentication
+- **email**: Required, must be valid email format
+- **password**: Required, minimum 8 characters, must contain at least one letter and one number
+- **confirmPassword**: Must match password field
 
 ### 4.2 Business Logic Implementation
 
-#### 4.2.1 Dashboard Status Calculation
+#### Dashboard Status Calculation
+**Location**: `/api/aquariums/:aquariumId/dashboard` endpoint
 
-**Algorithm:**
+**Logic**:
+1. Fetch latest measurement for each parameter
+2. Get optimal range from `default_optimal_values` for aquarium's type
+3. Calculate deviation percentage: `|current_value - midpoint| / range * 100`
+4. Determine status:
+   - `no_data`: No measurement exists
+   - `normal` (green): Deviation < 10%
+   - `warning` (orange): Deviation 10-20%
+   - `critical` (red): Deviation > 20%
+
+#### AI Recommendation Generation
+**Location**: `/api/aquariums/:aquariumId/recommendations` endpoint
+
+**Logic**:
+1. Validate parameter and optimal range
+2. Calculate deviation from optimal range
+3. Construct prompt for AI service (OpenRouter) including:
+   - Parameter name and current value
+   - Optimal range
+   - Aquarium type context
+   - Request for general recommendations (no product promotions)
+4. Call AI API and parse response
+5. Add disclaimer to response
+6. Return structured recommendation
+
+**AI Prompt Template**:
 ```
-1. For each parameter tracked by the app:
-   a. Get latest measurement for the aquarium
-   b. Get optimal range from default_optimal_values for the aquarium type
-   c. Calculate optimal midpoint: mid = (min + max) / 2
-   d. Calculate deviation: |value - mid| / mid * 100
-   e. Assign status:
-      - deviation < 10%: "optimal" (green)
-      - deviation 10-20%: "warning" (orange)
-      - deviation > 20%: "critical" (red)
-      - no measurement: "no_data" (gray)
-   f. Return parameter with value, range, status, and deviation
-```
+You are an expert marine aquarium consultant. Analyze the following water parameter:
 
-**Performance Optimization:**
-- Use index `idx_measurements_latest` for efficient latest measurement queries
-- Cache optimal values per aquarium type
-- Single query with LEFT JOIN to get all parameters including unmeasured ones
+Parameter: {full_name} ({name})
+Current Value: {value} {unit}
+Optimal Range: {min} - {max} {unit}
+Aquarium Type: {aquarium_type_name}
 
-#### 4.2.2 Batch Measurement Creation
+The current value deviates by {deviation_percentage}% from the optimal range.
 
-**Algorithm:**
-```
-1. Accept array of measurement objects in request body
-2. Validate each measurement individually
-3. Set same timestamp for all measurements in the batch
-4. Insert all measurements in a single transaction
-5. Return all created measurements with generated IDs
-```
+Provide:
+1. A brief analysis of what this deviation means for the aquarium
+2. 3-5 general corrective actions the user can take
+3. Potential causes of this deviation
 
-**Benefits:**
-- Allows users to enter all 7 parameters at once (typical use case)
-- Maintains temporal consistency (all measurements from same test session)
-- Reduces API calls from 7 to 1
-
-#### 4.2.3 Historical Data Queries
-
-**Filtering Logic:**
-- `date` parameter: Return all measurements where DATE(created_at) = date
-- `from` and `to` parameters: Return measurements where created_at BETWEEN from AND to
-- `parameter_id`: Filter to specific parameter only
-- Default sort: newest first (created_at DESC)
-- Pagination: Use LIMIT and OFFSET for large result sets
-
-#### 4.2.4 AI Analysis Generation
-
-**Process Flow:**
-```
-1. Retrieve measurement details (value, timestamp)
-2. Retrieve parameter information (name, unit)
-3. Retrieve optimal range for aquarium type
-4. Calculate deviation and status
-5. Construct prompt for AI service:
-   - Include aquarium type
-   - Include parameter name, value, unit
-   - Include optimal range
-   - Include deviation percentage
-   - Request: analysis summary, specific recommendations, warnings
-   - Specify: no product promotion, general advice only
-6. Call OpenRouter API with structured prompt
-7. Parse AI response
-8. Add disclaimer to response
-9. Return formatted analysis
+Keep recommendations general and educational. Do not promote specific commercial products.
 ```
 
-**Rate Limiting:**
-- Limit: 10 requests per minute per user
-- Prevents excessive AI API costs
-- Returns 429 status with retry_after seconds
+#### Measurement Calendar
+**Location**: `/api/aquariums/:aquariumId/measurements/calendar` endpoint
 
-**Error Handling:**
-- AI service timeout: Return 503 with user-friendly message
-- Invalid response: Return generic error, log for debugging
-- Cost limit reached: Return 503, notify administrators
+**Logic**:
+1. Group measurements by date (using `DATE(measurement_time)`)
+2. Count measurements per date
+3. Filter by optional year/month parameters
+4. Return array of dates with measurement counts for calendar display
 
-### 4.3 Data Validation Error Responses
+#### Latest Measurements
+**Location**: `/api/aquariums/:aquariumId/measurements/latest` endpoint
 
-All validation errors return `400 Bad Request` with structured error information:
+**Logic**:
+1. For each parameter in `parameters` table
+2. Find the most recent measurement (`MAX(measurement_time)`)
+3. Return array with one entry per parameter
+4. Include parameter details (name, unit, etc.)
 
+#### Bulk Measurement Creation
+**Location**: `/api/aquariums/:aquariumId/measurements/bulk` endpoint
+
+**Logic**:
+1. Validate all measurements in the batch
+2. Use same `measurement_time` for all measurements in the batch
+3. Execute as a database transaction (all succeed or all fail)
+4. Return array of created measurements
+
+### 4.3 Error Handling Strategy
+
+#### Validation Errors (400)
+- Use Zod for request body validation
+- Return structured error responses with field-level details:
 ```json
 {
   "error": {
+    "code": "VALIDATION_ERROR",
     "message": "Validation failed",
     "details": [
       {
-        "field": "field_name",
-        "message": "Specific error message"
+        "field": "name",
+        "message": "Name is required"
       }
     ]
   }
 }
 ```
 
-**Common Validation Errors:**
-- Required field missing: `"{field} is required"`
-- Invalid UUID format: `"Invalid UUID format for {field}"`
-- Invalid numeric value: `"Value must be a number with max 4 decimal places"`
-- String too long: `"{field} must be {max} characters or less"`
-- Referenced entity not found: `"{entity} not found"`
-- Out of range: `"Value must be between {min} and {max}"`
+#### Authentication Errors (401)
+```json
+{
+  "error": {
+    "code": "UNAUTHORIZED",
+    "message": "Authentication required"
+  }
+}
+```
+
+#### Authorization Errors (403)
+```json
+{
+  "error": {
+    "code": "FORBIDDEN",
+    "message": "You don't have permission to access this resource"
+  }
+}
+```
+
+#### Not Found Errors (404)
+```json
+{
+  "error": {
+    "code": "NOT_FOUND",
+    "message": "Resource not found"
+  }
+}
+```
+
+#### Conflict Errors (409)
+```json
+{
+  "error": {
+    "code": "CONFLICT",
+    "message": "Resource already exists",
+    "details": "An aquarium with this name already exists"
+  }
+}
+```
+
+#### Server Errors (500)
+```json
+{
+  "error": {
+    "code": "INTERNAL_SERVER_ERROR",
+    "message": "An unexpected error occurred"
+  }
+}
+```
 
 ### 4.4 Database Constraints Enforcement
 
-The API relies on PostgreSQL constraints for data integrity:
+All database constraints are enforced at both the API level (for better error messages) and database level (for data integrity):
 
-1. **Foreign Key Constraints**: Automatically validated by database
-2. **NOT NULL Constraints**: Validated at API level before database insertion
-3. **UNIQUE Constraints**: Database returns error, API translates to user-friendly message
-4. **ON DELETE CASCADE**: Measurements automatically deleted when aquarium is deleted
-5. **ON DELETE RESTRICT**: Prevents deletion of aquarium_types if referenced by aquariums
+- **CHECK constraints**: `value >= 0`, `max_value > min_value`
+- **UNIQUE constraints**: `(user_id, name)` for aquariums, `(aquarium_type_id, parameter_id)` for default optimal values
+- **FOREIGN KEY constraints**: All relationships with appropriate `ON DELETE` behaviors
+- **NOT NULL constraints**: All required fields
+- **RLS policies**: Enforced by Supabase at the database level for multi-tenant data isolation
 
-### 4.5 Timestamp Handling
+### 4.5 Performance Optimization
 
-- All timestamps stored as `TIMESTAMPTZ` (timezone-aware)
-- `created_at` automatically set to `now()` if not provided
-- Client can provide `created_at` for backdating measurements (e.g., manual data entry)
-- All timestamps returned in ISO 8601 format with UTC timezone
+#### Pagination Strategy
+- Use offset-based pagination for simplicity in MVP
+- Default limit: 50 items
+- Maximum limit: 200 items
+- Return total count for UI pagination controls
 
----
+#### Caching Strategy
+- Reference data (aquarium types, parameters, default optimal values) can be cached client-side
+- Latest measurements cached with short TTL (5 minutes)
+- No caching for write operations
 
-## 5. API Versioning and Future Considerations
-
-### 5.1 Current Version
-
-- All endpoints are prefixed with `/api/`
-- Current version: MVP (no version number in path)
-- Breaking changes will introduce `/api/v2/` when needed
-
-### 5.2 Potential Future Endpoints
-
-While outside MVP scope, the API is designed to support:
-
-- `GET /api/aquariums/:id/measurements/trends` - Parameter trends over time
-- `POST /api/aquariums/:id/measurements/import` - CSV import
-- `GET /api/aquariums/:id/reports` - Generate PDF reports
-- `PATCH /api/aquariums/:id/optimal-values/:parameterId` - Custom optimal ranges
-- `GET /api/measurements/export` - Export data
-
-### 5.3 Deprecation Policy
-
-When introducing breaking changes:
-1. Announce deprecation 90 days in advance
-2. Support old version for 180 days after new version release
-3. Return `Deprecation` header with sunset date
-4. Document migration path in API documentation
+#### Database Query Optimization
+- Use composite indexes defined in database schema
+- Leverage Supabase's automatic query optimization
+- Avoid N+1 queries by using joins for related data
+- Use `select` to limit returned columns when possible
 
