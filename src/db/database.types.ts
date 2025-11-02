@@ -22,16 +22,19 @@ export interface Database {
     Tables: {
       aquarium_types: {
         Row: {
+          created_at: string;
           description: string | null;
           id: string;
           name: string;
         };
         Insert: {
+          created_at?: string;
           description?: string | null;
           id?: string;
           name: string;
         };
         Update: {
+          created_at?: string;
           description?: string | null;
           id?: string;
           name?: string;
@@ -41,27 +44,33 @@ export interface Database {
       aquariums: {
         Row: {
           aquarium_type_id: string;
-          created_at: string | null;
+          created_at: string;
           description: string | null;
           id: string;
           name: string;
+          updated_at: string;
           user_id: string;
+          volume: number | null;
         };
         Insert: {
           aquarium_type_id: string;
-          created_at?: string | null;
+          created_at?: string;
           description?: string | null;
           id?: string;
           name: string;
+          updated_at?: string;
           user_id: string;
+          volume?: number | null;
         };
         Update: {
           aquarium_type_id?: string;
-          created_at?: string | null;
+          created_at?: string;
           description?: string | null;
           id?: string;
           name?: string;
+          updated_at?: string;
           user_id?: string;
+          volume?: number | null;
         };
         Relationships: [
           {
@@ -76,6 +85,7 @@ export interface Database {
       default_optimal_values: {
         Row: {
           aquarium_type_id: string;
+          created_at: string;
           id: string;
           max_value: number;
           min_value: number;
@@ -83,6 +93,7 @@ export interface Database {
         };
         Insert: {
           aquarium_type_id: string;
+          created_at?: string;
           id?: string;
           max_value: number;
           min_value: number;
@@ -90,6 +101,7 @@ export interface Database {
         };
         Update: {
           aquarium_type_id?: string;
+          created_at?: string;
           id?: string;
           max_value?: number;
           min_value?: number;
@@ -115,22 +127,28 @@ export interface Database {
       measurements: {
         Row: {
           aquarium_id: string;
-          created_at: string | null;
+          created_at: string;
           id: string;
+          measurement_time: string;
+          notes: string | null;
           parameter_id: string;
           value: number;
         };
         Insert: {
           aquarium_id: string;
-          created_at?: string | null;
+          created_at?: string;
           id?: string;
+          measurement_time?: string;
+          notes?: string | null;
           parameter_id: string;
           value: number;
         };
         Update: {
           aquarium_id?: string;
-          created_at?: string | null;
+          created_at?: string;
           id?: string;
+          measurement_time?: string;
+          notes?: string | null;
           parameter_id?: string;
           value?: number;
         };
@@ -153,16 +171,25 @@ export interface Database {
       };
       parameters: {
         Row: {
+          created_at: string;
+          description: string | null;
+          full_name: string;
           id: string;
           name: string;
           unit: string;
         };
         Insert: {
+          created_at?: string;
+          description?: string | null;
+          full_name: string;
           id?: string;
           name: string;
           unit: string;
         };
         Update: {
+          created_at?: string;
+          description?: string | null;
+          full_name?: string;
           id?: string;
           name?: string;
           unit?: string;
