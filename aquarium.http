@@ -1,0 +1,96 @@
+### Create a new aquarium
+POST http://localhost:3000/api/aquariums
+Content-Type: application/json
+
+{
+  "name": "Cube 2",
+  "aquarium_type_id": "57f90d24-ae6c-45ba-9a53-a8f36a3116b9",
+  "description": "A small cube-shaped aquarium with LPS corals.",
+  "volume": 40
+}
+
+###
+
+### Get a single aquarium (replace {id} with actual aquarium ID)
+GET http://localhost:3000/api/aquariums/50ab2303-9362-4278-8b1c-f05a2282ee31
+Content-Type: application/json
+
+###
+
+### Update aquarium name (replace {id} with actual aquarium ID)
+PATCH http://localhost:3000/api/aquariums/50ab2303-9362-4278-8b1c-f05a2282ee31
+Content-Type: application/json
+
+{
+  "name": "Updated Cube"
+}
+
+###
+
+### Update multiple fields (replace {id} with actual aquarium ID)
+PATCH http://localhost:3000/api/aquariums/{id}
+Content-Type: application/json
+
+{
+  "name": "Renamed Cube",
+  "description": "Updated description with more details",
+  "volume": 50
+}
+
+###
+
+### Update aquarium type (replace {id} and {aquarium_type_id} with actual IDs)
+PATCH http://localhost:3000/api/aquariums/{id}
+Content-Type: application/json
+
+{
+  "aquarium_type_id": "{aquarium_type_id}"
+}
+
+###
+
+### Delete aquarium (replace {id} with actual aquarium ID)
+DELETE http://localhost:3000/api/aquariums/{id}
+Content-Type: application/json
+
+###
+
+### Error examples - Invalid UUID format
+GET http://localhost:3000/api/aquariums/invalid-uuid
+Content-Type: application/json
+
+###
+
+### Error examples - Aquarium not found
+GET http://localhost:3000/api/aquariums/99999999-9999-9999-9999-999999999999
+Content-Type: application/json
+
+###
+
+### Error examples - PATCH with empty name
+PATCH http://localhost:3000/api/aquariums/{id}
+Content-Type: application/json
+
+{
+  "name": ""
+}
+
+###
+
+### Error examples - PATCH with no fields
+PATCH http://localhost:3000/api/aquariums/{id}
+Content-Type: application/json
+
+{}
+
+###
+
+### Error examples - PATCH with invalid aquarium_type_id
+PATCH http://localhost:3000/api/aquariums/{id}
+Content-Type: application/json
+
+{
+  "aquarium_type_id": "invalid-uuid"
+}
+
+###
