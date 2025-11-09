@@ -14,6 +14,7 @@ A web application for marine aquarium hobbyists to monitor water parameters, ana
 - [Project Scope](#project-scope)
 - [Project Status](#project-status)
 - [License](#license)
+- [API Documentation](#api-documentation)
 
 ## Project Description
 
@@ -120,3 +121,72 @@ This project is currently in the **MVP development phase**. The core features ar
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
 
+## API Documentation
+
+The ReefMetrics API provides REST endpoints for managing aquariums and their measurements. All endpoints require authentication via Supabase JWT tokens.
+
+### Authentication
+All API requests must include a valid JWT token obtained from Supabase authentication. The token is automatically handled by the frontend client.
+
+### Endpoints
+
+#### Aquariums
+- `GET /api/aquariums` - List user's aquariums
+- `POST /api/aquariums` - Create new aquarium
+- `GET /api/aquariums/:id` - Get aquarium details
+- `PATCH /api/aquariums/:id` - Update aquarium
+- `DELETE /api/aquariums/:id` - Delete aquarium
+
+#### Measurements
+- `GET /api/aquariums/:aquariumId/measurements` - List measurements with filtering and pagination
+  - Query params: `start_date`, `end_date`, `parameter_id`, `limit`, `offset`, `sort`, `order`
+- `GET /api/aquariums/:aquariumId/measurements/latest` - Get latest measurement per parameter
+- `GET /api/aquariums/:aquariumId/measurements/by-date/:date` - Get measurements for specific date (YYYY-MM-DD)
+- `GET /api/aquariums/:aquariumId/measurements/calendar` - Get calendar dates with measurement counts
+- `POST /api/aquariums/:aquariumId/measurements` - Create single measurement
+- `POST /api/aquariums/:aquariumId/measurements/bulk` - Create multiple measurements
+- `GET /api/measurements/:id` - Get single measurement
+- `PATCH /api/measurements/:id` - Update measurement
+- `DELETE /api/measurements/:id` - Delete measurement
+
+#### Reference Data
+- `GET /api/aquarium-types` - List all aquarium types
+- `GET /api/aquarium-types/:id` - Get single aquarium type
+- `GET /api/parameters` - List all parameters
+- `GET /api/parameters/:id` - Get single parameter
+- `GET /api/default-optimal-values` - List default optimal values with optional filters
+  - Query params: `aquarium_type_id`, `parameter_id`
+- `GET /api/aquarium-types/:aquariumTypeId/optimal-values` - Get optimal values for specific aquarium type
+
+### Response Format
+All responses follow a consistent structure:
+```json
+{
+  "data": { ... } // Single item or array
+}
+```
+
+Paginated responses include:
+```json
+{
+  "data": [...],
+  "pagination": {
+    "total": 100,
+    "limit": 50,
+    "offset": 0
+  }
+}
+```
+
+### Error Responses
+```json
+{
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Human readable message",
+    "details": [...] // Optional validation errors
+  }
+}
+```
+
+Common error codes: `UNAUTHORIZED`, `NOT_FOUND`, `VALIDATION_ERROR`, `INTERNAL_ERROR`

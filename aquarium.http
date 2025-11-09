@@ -94,3 +94,213 @@ Content-Type: application/json
 }
 
 ###
+
+### Measurements API Tests
+
+### Create a single measurement (replace {aquariumId} and {parameterId} with actual IDs)
+POST http://localhost:3000/api/aquariums/50ab2303-9362-4278-8b1c-f05a2282ee31/measurements
+Content-Type: application/json
+
+{
+  "parameter_id": "example-parameter-id-uuid",
+  "value": 8.2,
+  "measurement_time": "2023-11-09T10:00:00.000Z",
+  "notes": "Morning measurement"
+}
+
+###
+
+### Bulk create measurements (replace {aquariumId} and parameter IDs with actual IDs)
+POST http://localhost:3000/api/aquariums/50ab2303-9362-4278-8b1c-f05a2282ee31/measurements/bulk
+Content-Type: application/json
+
+{
+  "measurement_time": "2023-11-09T10:00:00.000Z",
+  "measurements": [
+    {
+      "parameter_id": "example-parameter-id-uuid",
+      "value": 8.2,
+      "notes": "pH measurement"
+    },
+    {
+      "parameter_id": "another-parameter-id-uuid",
+      "value": 25.5,
+      "notes": "Temperature"
+    }
+  ]
+}
+
+###
+
+### Get measurements list with pagination (replace {aquariumId} with actual ID)
+GET http://localhost:3000/api/aquariums/50ab2303-9362-4278-8b1c-f05a2282ee31/measurements?limit=10&offset=0&sort=measurement_time&order=desc
+Content-Type: application/json
+
+###
+
+### Get measurements with date filters (replace {aquariumId} with actual ID)
+GET http://localhost:3000/api/aquariums/50ab2303-9362-4278-8b1c-f05a2282ee31/measurements?start_date=2023-11-01T00:00:00.000Z&end_date=2023-11-30T23:59:59.999Z
+Content-Type: application/json
+
+###
+
+### Get latest measurements (replace {aquariumId} with actual ID)
+GET http://localhost:3000/api/aquariums/50ab2303-9362-4278-8b1c-f05a2282ee31/measurements/latest
+Content-Type: application/json
+
+###
+
+### Get measurements by date (replace {aquariumId} and date with actual values)
+GET http://localhost:3000/api/aquariums/50ab2303-9362-4278-8b1c-f05a2282ee31/measurements/by-date/2023-11-09
+Content-Type: application/json
+
+###
+
+### Get measurement calendar (replace {aquariumId} with actual ID)
+GET http://localhost:3000/api/aquariums/50ab2303-9362-4278-8b1c-f05a2282ee31/measurements/calendar
+Content-Type: application/json
+
+###
+
+### Get single measurement (replace {measurementId} with actual ID)
+GET http://localhost:3000/api/measurements/example-measurement-id-uuid
+Content-Type: application/json
+
+###
+
+### Update measurement (replace {measurementId} with actual ID)
+PATCH http://localhost:3000/api/measurements/example-measurement-id-uuid
+Content-Type: application/json
+
+{
+  "value": 8.3,
+  "notes": "Updated measurement"
+}
+
+###
+
+### Delete measurement (replace {measurementId} with actual ID)
+DELETE http://localhost:3000/api/measurements/example-measurement-id-uuid
+Content-Type: application/json
+
+###
+
+### Error examples - Invalid parameter ID
+POST http://localhost:3000/api/aquariums/50ab2303-9362-4278-8b1c-f05a2282ee31/measurements
+Content-Type: application/json
+
+{
+  "parameter_id": "invalid-uuid",
+  "value": 8.2
+}
+
+###
+
+### Error examples - Negative value
+POST http://localhost:3000/api/aquariums/50ab2303-9362-4278-8b1c-f05a2282ee31/measurements
+Content-Type: application/json
+
+{
+  "parameter_id": "example-parameter-id-uuid",
+  "value": -1
+}
+
+###
+
+### Error examples - Invalid date format
+GET http://localhost:3000/api/aquariums/50ab2303-9362-4278-8b1c-f05a2282ee31/measurements/by-date/invalid-date
+Content-Type: application/json
+
+###
+
+### Error examples - Measurement not found
+GET http://localhost:3000/api/measurements/99999999-9999-9999-9999-999999999999
+Content-Type: application/json
+
+###
+
+### Error examples - Access denied (wrong user)
+GET http://localhost:3000/api/aquariums/50ab2303-9362-4278-8b1c-f05a2282ee31/measurements
+Content-Type: application/json
+
+###
+
+### Reference Data API Tests
+
+### Get all aquarium types
+GET http://localhost:3000/api/aquarium-types
+Content-Type: application/json
+
+###
+
+### Get single aquarium type (replace {id} with actual aquarium type ID)
+GET http://localhost:3000/api/aquarium-types/example-aquarium-type-id
+Content-Type: application/json
+
+###
+
+### Get all parameters
+GET http://localhost:3000/api/parameters
+Content-Type: application/json
+
+###
+
+### Get single parameter (replace {id} with actual parameter ID)
+GET http://localhost:3000/api/parameters/example-parameter-id
+Content-Type: application/json
+
+###
+
+### Get default optimal values (all)
+GET http://localhost:3000/api/default-optimal-values
+Content-Type: application/json
+
+###
+
+### Get default optimal values filtered by aquarium type
+GET http://localhost:3000/api/default-optimal-values?aquarium_type_id=example-aquarium-type-id
+Content-Type: application/json
+
+###
+
+### Get default optimal values filtered by parameter
+GET http://localhost:3000/api/default-optimal-values?parameter_id=example-parameter-id
+Content-Type: application/json
+
+###
+
+### Get optimal values for aquarium type (replace {aquariumTypeId} with actual ID)
+GET http://localhost:3000/api/aquarium-types/example-aquarium-type-id/optimal-values
+Content-Type: application/json
+
+###
+
+### Error examples - Invalid UUID format
+GET http://localhost:3000/api/aquarium-types/invalid-uuid
+Content-Type: application/json
+
+###
+
+### Error examples - Aquarium type not found
+GET http://localhost:3000/api/aquarium-types/99999999-9999-9999-9999-999999999999
+Content-Type: application/json
+
+###
+
+### Error examples - Parameter not found
+GET http://localhost:3000/api/parameters/99999999-9999-9999-9999-999999999999
+Content-Type: application/json
+
+###
+
+### Error examples - Invalid query parameter UUID
+GET http://localhost:3000/api/default-optimal-values?aquarium_type_id=invalid-uuid
+Content-Type: application/json
+
+###
+
+### Error examples - Aquarium type not found for optimal values
+GET http://localhost:3000/api/aquarium-types/99999999-9999-9999-9999-999999999999/optimal-values
+Content-Type: application/json
+
+###
