@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { APIRoute } from "astro";
 import { MeasurementsService } from "@/lib/services/measurements.service";
+import { DEFAULT_USER_ID } from "@/db/supabase.client";
 
 // Zod schemas for validation
 const getMeasurementsQuerySchema = z.object({
@@ -47,8 +48,8 @@ export const GET: APIRoute = async ({ params, url, locals }) => {
       );
     }
 
-    const { data: user } = await supabaseClient.auth.getUser();
-    if (!user.user) {
+    const userId = DEFAULT_USER_ID;
+    if (!userId) {
       return new Response(
         JSON.stringify({
           error: { code: "UNAUTHORIZED", message: "Invalid authentication" },
@@ -91,7 +92,7 @@ export const GET: APIRoute = async ({ params, url, locals }) => {
       }
 
       const { measurements, total } = await measurementsService.getMeasurements(
-        user.user.id,
+        userId,
         aquariumId,
         {
           start_date: validation.data.start_date,
@@ -123,7 +124,7 @@ export const GET: APIRoute = async ({ params, url, locals }) => {
 
     if (subPath === "measurements/latest") {
       // GET /api/aquariums/:aquariumId/measurements/latest
-      const measurements = await measurementsService.getLatestMeasurements(user.user.id, aquariumId);
+      const measurements = await measurementsService.getLatestMeasurements(userId, aquariumId);
 
       return new Response(JSON.stringify({ data: measurements }), {
         status: 200,
@@ -143,7 +144,7 @@ export const GET: APIRoute = async ({ params, url, locals }) => {
         );
       }
 
-      const measurements = await measurementsService.getMeasurementsByDate(user.user.id, aquariumId, date);
+      const measurements = await measurementsService.getMeasurementsByDate(userId, aquariumId, date);
 
       return new Response(JSON.stringify({ data: measurements }), {
         status: 200,
@@ -153,7 +154,7 @@ export const GET: APIRoute = async ({ params, url, locals }) => {
 
     if (subPath === "measurements/calendar") {
       // GET /api/aquariums/:aquariumId/measurements/calendar
-      const calendar = await measurementsService.getMeasurementCalendar(user.user.id, aquariumId);
+      const calendar = await measurementsService.getMeasurementCalendar(userId, aquariumId);
 
       return new Response(JSON.stringify({ data: calendar }), {
         status: 200,
@@ -200,8 +201,8 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
       );
     }
 
-    const { data: user } = await supabaseClient.auth.getUser();
-    if (!user.user) {
+    const userId = DEFAULT_USER_ID;
+    if (!userId) {
       return new Response(
         JSON.stringify({
           error: { code: "UNAUTHORIZED", message: "Invalid authentication" },
@@ -243,7 +244,7 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
         );
       }
 
-      const measurement = await measurementsService.createMeasurement(user.user.id, aquariumId, validation.data);
+      const measurement = await measurementsService.createMeasurement(userId, aquariumId, validation.data);
 
       return new Response(JSON.stringify({ data: measurement }), {
         status: 201,
@@ -269,7 +270,7 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
         );
       }
 
-      const measurements = await measurementsService.bulkCreateMeasurements(user.user.id, aquariumId, validation.data);
+      const measurements = await measurementsService.bulkCreateMeasurements(userId, aquariumId, validation.data);
 
       return new Response(JSON.stringify({ data: measurements }), {
         status: 201,
