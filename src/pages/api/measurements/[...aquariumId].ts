@@ -73,8 +73,8 @@ export const GET: APIRoute = async ({ params, url, locals }) => {
 
     const subPath = pathSegments.slice(1).join("/");
 
-    if (subPath === "measurements") {
-      // GET /api/aquariums/:aquariumId/measurements
+    if (subPath === "" || subPath === undefined) {
+      // GET /api/measurements/:aquariumId
       const queryParams = Object.fromEntries(url.searchParams);
       const validation = getMeasurementsQuerySchema.safeParse(queryParams);
 
@@ -122,8 +122,8 @@ export const GET: APIRoute = async ({ params, url, locals }) => {
       );
     }
 
-    if (subPath === "measurements/latest") {
-      // GET /api/aquariums/:aquariumId/measurements/latest
+    if (subPath === "latest") {
+      // GET /api/measurements/:aquariumId/latest
       const measurements = await measurementsService.getLatestMeasurements(userId, aquariumId);
 
       return new Response(JSON.stringify({ data: measurements }), {
@@ -132,9 +132,9 @@ export const GET: APIRoute = async ({ params, url, locals }) => {
       });
     }
 
-    if (subPath.startsWith("measurements/by-date/")) {
-      // GET /api/aquariums/:aquariumId/measurements/by-date/:date
-      const date = subPath.replace("measurements/by-date/", "");
+    if (subPath.startsWith("by-date/")) {
+      // GET /api/measurements/:aquariumId/by-date/:date
+      const date = subPath.replace("by-date/", "");
       if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
         return new Response(
           JSON.stringify({
@@ -152,8 +152,8 @@ export const GET: APIRoute = async ({ params, url, locals }) => {
       });
     }
 
-    if (subPath === "measurements/calendar") {
-      // GET /api/aquariums/:aquariumId/measurements/calendar
+    if (subPath === "calendar") {
+      // GET /api/measurements/:aquariumId/calendar
       const calendar = await measurementsService.getMeasurementCalendar(userId, aquariumId);
 
       return new Response(JSON.stringify({ data: calendar }), {
@@ -226,8 +226,8 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
 
     const subPath = pathSegments.slice(1).join("/");
 
-    if (subPath === "measurements") {
-      // POST /api/aquariums/:aquariumId/measurements
+    if (subPath === "" || subPath === undefined) {
+      // POST /api/measurements/:aquariumId
       const body = await request.json();
       const validation = createMeasurementBodySchema.safeParse(body);
 
@@ -252,8 +252,8 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
       });
     }
 
-    if (subPath === "measurements/bulk") {
-      // POST /api/aquariums/:aquariumId/measurements/bulk
+    if (subPath === "bulk") {
+      // POST /api/measurements/:aquariumId/bulk
       const body = await request.json();
       const validation = bulkCreateMeasurementsBodySchema.safeParse(body);
 

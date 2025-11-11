@@ -225,7 +225,7 @@ export type AquariumListItemDTO = Omit<AquariumDTO, "aquarium_type"> & {
 
 /**
  * Command for creating a single measurement
- * Used in: POST /api/aquariums/:id/measurements
+ * Used in: POST /api/measurements/:aquariumId
  */
 export interface CreateMeasurementCommand {
   parameter_id: string;
@@ -245,7 +245,7 @@ export interface BulkMeasurementItem {
 
 /**
  * Command for bulk creating measurements
- * Used in: POST /api/aquariums/:id/measurements/bulk
+ * Used in: POST /api/measurements/:aquariumId/bulk
  */
 export interface BulkCreateMeasurementsCommand {
   measurement_time?: string;
@@ -264,7 +264,7 @@ export interface UpdateMeasurementCommand {
 
 /**
  * Measurement DTO with nested parameter
- * Used in: GET /api/aquariums/:id/measurements, GET /api/measurements/:id, etc.
+ * Used in: GET /api/measurements/:aquariumId, GET /api/measurements/:id, etc.
  */
 export interface MeasurementDTO {
   id: string;
@@ -283,7 +283,7 @@ export interface MeasurementDTO {
 
 /**
  * Latest measurement DTO with full parameter details
- * Used in: GET /api/aquariums/:id/measurements/latest
+ * Used in: GET /api/measurements/:aquariumId/latest
  */
 export interface LatestMeasurementDTO {
   id: string;
@@ -303,7 +303,7 @@ export interface LatestMeasurementDTO {
 
 /**
  * Measurement date for calendar display
- * Used in: GET /api/aquariums/:id/measurements/calendar
+ * Used in: GET /api/measurements/:aquariumId/calendar
  */
 export interface MeasurementDateDTO {
   date: string; // YYYY-MM-DD format
@@ -491,3 +491,41 @@ export type UpdateMeasurementResponseDTO = ApiResponseDTO<Omit<MeasurementDTO, "
 // AI Recommendations responses
 export type RecommendationResponseDTO = ApiResponseDTO<RecommendationDTO>;
 export type DashboardResponseDTO = ApiResponseDTO<DashboardDTO>;
+
+// ============================================================================
+// Dashboard View Models
+// ============================================================================
+
+/**
+ * Parameter status view model for dashboard cards
+ * Combines measurement data with optimal ranges and calculated status
+ */
+export interface ParameterStatusViewModel {
+  parameterId: string;
+  name: string;
+  fullName: string;
+  unit: string;
+  currentValue: number | null;
+  optimalMin: number;
+  optimalMax: number;
+  deviationPercentage: number | null;
+  status: ParameterStatus;
+  measurementTime: string | null;
+}
+
+/**
+ * Main view model for dashboard state
+ */
+export interface DashboardViewModel {
+  aquariums: AquariumListItemDTO[];
+  selectedAquariumId: string | null;
+  parameters: ParameterStatusViewModel[];
+  lastMeasurementTime: string | null;
+  isLoading: boolean;
+  error: string | null;
+}
+
+/**
+ * Type for empty state variants
+ */
+export type DashboardEmptyStateType = "no-aquariums" | "no-measurements" | "loading" | null;

@@ -416,7 +416,7 @@
 
 #### List Measurements for Aquarium
 - **Method**: `GET`
-- **Path**: `/api/aquariums/:aquariumId/measurements`
+- **Path**: `/api/measurements/:aquariumId`
 - **Description**: Get measurements for a specific aquarium with filtering and pagination
 - **Query Parameters**:
   - `start_date` (optional): Filter measurements from this date (ISO 8601)
@@ -460,7 +460,7 @@
 
 #### Get Latest Measurements for Aquarium
 - **Method**: `GET`
-- **Path**: `/api/aquariums/:aquariumId/measurements/latest`
+- **Path**: `/api/measurements/:aquariumId/latest`
 - **Description**: Get the most recent measurement for each parameter
 - **Response** (200 OK):
 ```json
@@ -491,7 +491,7 @@
 
 #### Get Measurements by Date
 - **Method**: `GET`
-- **Path**: `/api/aquariums/:aquariumId/measurements/by-date/:date`
+- **Path**: `/api/measurements/:aquariumId/by-date/:date`
 - **Description**: Get all measurements for a specific date (YYYY-MM-DD)
 - **Response** (200 OK):
 ```json
@@ -522,7 +522,7 @@
 
 #### Get Measurement Dates Calendar
 - **Method**: `GET`
-- **Path**: `/api/aquariums/:aquariumId/measurements/calendar`
+- **Path**: `/api/measurements/:aquariumId/calendar`
 - **Description**: Get list of dates that have measurements for calendar display
 - **Query Parameters**:
   - `year` (optional): Filter by year (default: current year)

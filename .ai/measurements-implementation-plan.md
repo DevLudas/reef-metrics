@@ -6,13 +6,13 @@ This plan covers the implementation of 9 REST API endpoints for managing aquariu
 ## 2. Request Details
 - **HTTP Methods**: GET (for retrievals), POST (for creation), PATCH (for updates), DELETE (for deletion)
 - **URL Structures**:
-  - GET /api/aquariums/:aquariumId/measurements (list with filters/pagination)
-  - GET /api/aquariums/:aquariumId/measurements/latest (latest per parameter)
-  - GET /api/aquariums/:aquariumId/measurements/by-date/:date (measurements for a date)
-  - GET /api/aquariums/:aquariumId/measurements/calendar (calendar dates)
+  - GET /api/measurements/:aquariumId (list with filters/pagination)
+  - GET /api/measurements/:aquariumId/latest (latest per parameter)
+  - GET /api/measurements/:aquariumId/by-date/:date (measurements for a date)
+  - GET /api/measurements/:aquariumId/calendar (calendar dates)
   - GET /api/measurements/:id (single measurement)
-  - POST /api/aquariums/:aquariumId/measurements (create single)
-  - POST /api/aquariums/:aquariumId/measurements/bulk (create bulk)
+  - POST /api/measurements/:aquariumId (create single)
+  - POST /api/measurements/:aquariumId/bulk (create bulk)
   - PATCH /api/measurements/:id (update)
   - DELETE /api/measurements/:id (delete)
 - **Parameters**:

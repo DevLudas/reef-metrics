@@ -104,16 +104,37 @@ export class MeasurementsService {
       throw new Error("NOT_FOUND");
     }
 
-    // Get latest measurement per parameter
-    const { data: measurements, error } = await this.supabase.rpc("get_latest_measurements", {
-      p_aquarium_id: aquariumId,
-    });
+    // Get latest measurement per parameter using a subquery
+    const { data: measurements, error } = await this.supabase
+      .from("measurements")
+      .select(
+        `
+        id,
+        aquarium_id,
+        parameter_id,
+        value,
+        measurement_time,
+        notes,
+        created_at,
+        parameter:parameters(id, name, full_name, unit)
+        `
+      )
+      .eq("aquarium_id", aquariumId)
+      .order("created_at", { ascending: false });
 
     if (error) {
       throw error;
     }
 
-    return measurements || [];
+    // Group by parameter_id and take the first (most recent) measurement for each
+    const latestByParameter = new Map<string, LatestMeasurementDTO>();
+    for (const measurement of measurements || []) {
+      if (!latestByParameter.has(measurement.parameter_id)) {
+        latestByParameter.set(measurement.parameter_id, measurement);
+      }
+    }
+
+    return Array.from(latestByParameter.values());
   }
 
   async getMeasurementsByDate(userId: string, aquariumId: string, date: string): Promise<MeasurementDTO[]> {
@@ -171,15 +192,30 @@ export class MeasurementsService {
       throw new Error("NOT_FOUND");
     }
 
-    const { data: calendar, error } = await this.supabase.rpc("get_measurement_calendar", {
-      p_aquarium_id: aquariumId,
-    });
+    // Get measurement calendar - dates with measurement counts
+    const { data: measurements, error } = await this.supabase
+      .from("measurements")
+      .select("measurement_time")
+      .eq("aquarium_id", aquariumId);
 
     if (error) {
       throw error;
     }
 
-    return calendar || [];
+    // Group by date and count measurements
+    const dateCountMap = new Map<string, number>();
+    for (const measurement of measurements || []) {
+      const date = new Date(measurement.measurement_time).toISOString().split("T")[0]; // YYYY-MM-DD
+      dateCountMap.set(date, (dateCountMap.get(date) || 0) + 1);
+    }
+
+    // Convert to array format
+    const calendar: MeasurementDateDTO[] = Array.from(dateCountMap.entries()).map(([date, measurement_count]) => ({
+      date,
+      measurement_count,
+    }));
+
+    return calendar;
   }
 
   async getMeasurement(userId: string, measurementId: string): Promise<MeasurementDTO> {
