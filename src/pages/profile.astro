@@ -1,0 +1,71 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { DEFAULT_USER_ID } from "@/db/supabase.client";
+
+// Mock user data - will be replaced with real data later
+const mockUserName = "Demo User";
+const mockUserId = DEFAULT_USER_ID;
+---
+
+<Layout title="Profile - ReefMetrics">
+  <main class="container mx-auto px-4 py-8">
+    <div class="mx-auto max-w-2xl">
+      <!-- Page header -->
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Profile</h1>
+        <p class="mt-2 text-gray-600">Manage your account settings</p>
+      </div>
+
+      <!-- Profile content placeholder -->
+      <div class="rounded-lg border border-gray-200 bg-white p-6">
+        <div class="space-y-6">
+          <!-- User info -->
+          <div>
+            <h2 class="text-lg font-semibold text-gray-900">User Information</h2>
+            <div class="mt-4 space-y-3">
+              <div>
+                <label class="text-sm font-medium text-gray-700">Name</label>
+                <p class="mt-1 text-gray-900">{mockUserName}</p>
+              </div>
+              <div>
+                <label class="text-sm font-medium text-gray-700">User ID</label>
+                <p class="mt-1 font-mono text-sm text-gray-600">{mockUserId}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Placeholder message -->
+          <div class="rounded-lg border border-gray-200 bg-gray-50 p-4">
+            <p class="text-sm text-gray-600">
+              Profile editing functionality will be implemented in a future update.
+            </p>
+          </div>
+
+          <!-- Back to dashboard link -->
+          <div class="flex justify-start border-t border-gray-200 pt-6">
+            <a
+              href="/"
+              class="inline-flex items-center gap-2 text-sm font-medium text-gray-900 hover:text-gray-700"
+            >
+              <svg
+                class="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+              </svg>
+              Back to Dashboard
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>
+

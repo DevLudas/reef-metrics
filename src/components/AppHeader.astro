@@ -1,0 +1,26 @@
+---
+import { UserMenu } from "./ui/UserMenu";
+import { DEFAULT_USER_ID } from "@/db/supabase.client";
+import { Image } from "astro:assets";
+import logo from "@/assets/logo.png";
+
+// Mock user for now - will be replaced with real auth later
+// TODO: Replace with actual user from session
+const mockUserName = "Ludes";
+---
+
+<header class="sticky top-0 z-50 w-full border-b border-gray-200 bg-white">
+  <div class="container mx-auto px-4">
+    <nav class="flex h-16 items-center justify-between">
+      <!-- Logo and brand name -->
+      <a href="/" class="flex items-center gap-1 hover:opacity-80 transition-opacity">
+        <Image src={logo} alt="ReefMetrics Logo" class="h-8 w-auto" />
+        <span class="text-xl font-bold text-gray-900">ReefMetrics</span>
+      </a>
+
+      <!-- User menu -->
+      <UserMenu client:load userName={mockUserName} />
+    </nav>
+  </div>
+</header>
+
