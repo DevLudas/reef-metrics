@@ -5,6 +5,9 @@ import { NoAquariumsEmptyState } from "./NoAquariumsEmptyState";
 import { NoMeasurementsEmptyState } from "./NoMeasurementsEmptyState";
 import { ParameterCardsGrid } from "./ParameterCardsGrid";
 import { AIRecommendationDrawer } from "./AIRecommendationDrawer";
+import { AddMeasurementForm } from "./AddMeasurementForm";
+import { Toaster } from "@/components/ui/toast";
+import { useToast } from "@/components/hooks/useToast";
 
 export interface DashboardContentProps {
   aquariums: AquariumListItemDTO[];
@@ -28,6 +31,12 @@ export function DashboardContent({
   const [selectedParameterId, setSelectedParameterId] = useState<string | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
+  // UI state for add measurement form
+  const [isAddMeasurementOpen, setIsAddMeasurementOpen] = useState(false);
+
+  // Toast notifications
+  const { toasts, removeToast, success, error } = useToast();
+
   // Handle add aquarium navigation
   const handleAddAquarium = () => {
     window.location.href = "/aquariums/new";
@@ -35,9 +44,23 @@ export function DashboardContent({
 
   // Handle add measurement
   const handleAddMeasurement = () => {
-    // TODO: Open measurement form modal
-    // Implementation will be added when measurement form component is created
+    setIsAddMeasurementOpen(true);
   };
+
+  // Handle successful measurement submission
+  const handleMeasurementSuccess = useCallback(() => {
+    success("Success!", "Measurements saved successfully.");
+    // Refresh page to show new data
+    window.location.reload();
+  }, [success]);
+
+  // Handle measurement submission error
+  const handleMeasurementError = useCallback(
+    (message: string) => {
+      error("Error", message);
+    },
+    [error]
+  );
 
   // Handle aquarium selection change
   const handleAquariumChange = useCallback((id: string) => {
@@ -85,6 +108,18 @@ export function DashboardContent({
           onAddMeasurement={handleAddMeasurement}
         />
         <NoMeasurementsEmptyState aquariumName={aquariumName} onAddMeasurement={handleAddMeasurement} />
+
+        {selectedAquariumId && (
+          <AddMeasurementForm
+            isOpen={isAddMeasurementOpen}
+            onClose={() => setIsAddMeasurementOpen(false)}
+            aquariumId={selectedAquariumId}
+            onSuccess={handleMeasurementSuccess}
+            onError={handleMeasurementError}
+          />
+        )}
+
+        <Toaster toasts={toasts} removeToast={removeToast} />
       </>
     );
   }
@@ -108,6 +143,18 @@ export function DashboardContent({
         aquariumId={selectedAquariumId}
         onClose={handleDrawerClose}
       />
+
+      {selectedAquariumId && (
+        <AddMeasurementForm
+          isOpen={isAddMeasurementOpen}
+          onClose={() => setIsAddMeasurementOpen(false)}
+          aquariumId={selectedAquariumId}
+          onSuccess={handleMeasurementSuccess}
+          onError={handleMeasurementError}
+        />
+      )}
+
+      <Toaster toasts={toasts} removeToast={removeToast} />
     </>
   );
 }

@@ -4,6 +4,8 @@ import type {
   DefaultOptimalValuesForTypeResponseDTO,
   RecommendationResponseDTO,
   GetRecommendationsCommand,
+  BulkCreateMeasurementsCommand,
+  ParametersListResponseDTO,
 } from "@/types";
 
 /**
@@ -73,6 +75,43 @@ export class DashboardAPI {
 
     if (!response.ok) {
       throw new Error("Failed to fetch recommendations");
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Fetch all available parameters
+   * @returns List of all parameters (SG, kH, Ca, Mg, PO4, NO3, Temp)
+   * @throws Error if request fails
+   */
+  async getParameters(): Promise<ParametersListResponseDTO> {
+    const response = await fetch("/api/parameters");
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch parameters");
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Create multiple measurements at once for an aquarium
+   * @param aquariumId - The ID of the aquarium
+   * @param command - The bulk measurement creation command
+   * @returns Created measurements
+   * @throws Error if request fails or validation fails
+   */
+  async createBulkMeasurements(aquariumId: string, command: BulkCreateMeasurementsCommand): Promise<any> {
+    const response = await fetch(`/api/measurements/${aquariumId}/bulk`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(command),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error?.message || "Failed to create measurements");
     }
 
     return response.json();

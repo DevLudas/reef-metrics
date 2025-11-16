@@ -1,5 +1,5 @@
 import { useState, useTransition } from "react";
-import { User, LogOut } from "lucide-react";
+import { LogOut, User } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -42,15 +42,12 @@ export function UserMenu({ userName }: UserMenuProps) {
         // Redirect to home page after logout
         window.location.href = "/";
       } catch (error) {
-        console.error("Error during logout:", error);
         setIsLoggingOut(false);
       }
     });
   };
 
   // Get initials for avatar
-  const initials = userName;
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -60,8 +57,8 @@ export function UserMenu({ userName }: UserMenuProps) {
           aria-label="User menu"
           disabled={isLoggingOut}
         >
-          <Avatar className="h-10 w-10">
-            <AvatarFallback className="bg-gray-900 text-white">{initials}</AvatarFallback>
+          <Avatar className="h-12 w-12">
+            <AvatarFallback className="bg-gray-900 text-white">{userName}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>

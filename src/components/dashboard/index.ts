@@ -3,6 +3,7 @@ export { DashboardHeader } from "./DashboardHeader";
 export { DashboardSkeleton } from "./DashboardSkeleton";
 export { AquariumSelector } from "./AquariumSelector";
 export { AddMeasurementButton } from "./AddMeasurementButton";
+export { AddMeasurementForm } from "./AddMeasurementForm";
 export { NoAquariumsEmptyState } from "./NoAquariumsEmptyState";
 export { NoMeasurementsEmptyState } from "./NoMeasurementsEmptyState";
 export { ParameterCard } from "./ParameterCard";
