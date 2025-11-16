@@ -28,7 +28,6 @@ export class AuthService {
         email: user.email || "",
       };
     } catch (error) {
-      console.error("Error getting current user:", error);
       return null;
     }
   }
@@ -47,4 +46,3 @@ export class AuthService {
 }
 
 export default AuthService;
-

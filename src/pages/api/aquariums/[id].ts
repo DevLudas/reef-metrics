@@ -57,7 +57,6 @@ export const GET: APIRoute = async ({ params, locals }) => {
     }
 
     // Log unexpected errors
-    console.error("Error getting aquarium:", error);
 
     return new Response(
       JSON.stringify({
@@ -133,7 +132,6 @@ export const PATCH: APIRoute = async ({ params, request, locals }) => {
     }
 
     // Log unexpected errors
-    console.error("Error updating aquarium:", error);
 
     return errorResponse("INTERNAL_SERVER_ERROR", "An unexpected error occurred", 500);
   }
@@ -170,7 +168,6 @@ export const DELETE: APIRoute = async ({ params, locals }) => {
     }
 
     // Log unexpected errors
-    console.error("Error deleting aquarium:", error);
 
     return errorResponse("INTERNAL_SERVER_ERROR", "An unexpected error occurred", 500);
   }

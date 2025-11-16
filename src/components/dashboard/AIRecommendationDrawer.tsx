@@ -52,7 +52,6 @@ export function AIRecommendationDrawer({ isOpen, parameter, aquariumId, onClose 
         setRecommendation(response.data);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load recommendations");
-        console.error("Error fetching recommendations:", err);
       } finally {
         setIsLoading(false);
       }

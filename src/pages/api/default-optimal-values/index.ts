@@ -51,8 +51,6 @@ export const GET: APIRoute = async ({ url, locals }) => {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error: unknown) {
-    console.error("GET /api/default-optimal-values error:", error);
-
     return new Response(
       JSON.stringify({
         error: { code: "INTERNAL_ERROR", message: "An unexpected error occurred" },

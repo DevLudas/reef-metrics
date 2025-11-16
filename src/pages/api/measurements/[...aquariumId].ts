@@ -169,7 +169,6 @@ export const GET: APIRoute = async ({ params, url, locals }) => {
       { status: 404, headers: { "Content-Type": "application/json" } }
     );
   } catch (error: any) {
-    console.error("GET /api/aquariums/[...aquariumId] error:", error);
 
     if (error.message === "NOT_FOUND") {
       return new Response(
@@ -285,7 +284,6 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
       { status: 404, headers: { "Content-Type": "application/json" } }
     );
   } catch (error: any) {
-    console.error("POST /api/aquariums/[...aquariumId] error:", error);
 
     if (error.message === "NOT_FOUND") {
       return new Response(

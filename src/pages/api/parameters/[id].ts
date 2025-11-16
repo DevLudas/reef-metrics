@@ -50,8 +50,6 @@ export const GET: APIRoute = async ({ params, locals }) => {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error: unknown) {
-    console.error("GET /api/parameters/[id] error:", error);
-
     const err = error as Error;
     if (err.message === "NOT_FOUND") {
       return new Response(

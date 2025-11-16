@@ -61,9 +61,6 @@ export const GET: APIRoute = async ({ request, locals }) => {
       }
     );
   } catch (error) {
-    // Log unexpected errors
-    console.error("Error listing aquariums:", error);
-
     return errorResponse("INTERNAL_SERVER_ERROR", "An unexpected error occurred", 500);
   }
 };
@@ -117,8 +114,5 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     // Log unexpected errors
-    console.error("Error creating aquarium:", error);
-
-    return errorResponse("INTERNAL_SERVER_ERROR", "An unexpected error occurred", 500);
   }
 };

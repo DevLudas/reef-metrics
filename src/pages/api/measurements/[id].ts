@@ -54,7 +54,6 @@ export const GET: APIRoute = async ({ params, locals }) => {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error: unknown) {
-    console.error("GET /api/measurements/[id] error:", error);
 
     const err = error as Error;
     if (err.message === "NOT_FOUND") {
@@ -133,7 +132,6 @@ export const PATCH: APIRoute = async ({ params, request, locals }) => {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error: unknown) {
-    console.error("PATCH /api/measurements/[id] error:", error);
 
     const err = error as Error;
     if (err.message === "NOT_FOUND") {
@@ -193,7 +191,6 @@ export const DELETE: APIRoute = async ({ params, locals }) => {
 
     return new Response(null, { status: 204 });
   } catch (error: unknown) {
-    console.error("DELETE /api/measurements/[id] error:", error);
 
     const err = error as Error;
     if (err.message === "NOT_FOUND") {
