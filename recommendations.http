@@ -1,0 +1,103 @@
+### AI Recommendations Endpoint Tests
+### POST /api/aquariums/:aquariumId/recommendations
+###
+### Generates AI-powered recommendations for parameter deviations
+
+### Test 1: Get recommendations for a parameter with deviation (Warning)
+POST http://localhost:4321/api/aquariums/{{aquariumId}}/recommendations
+Content-Type: application/json
+
+{
+  "parameter_id": "{{parameterId}}",
+  "current_value": 8.5,
+  "optimal_min": 7.8,
+  "optimal_max": 8.3
+}
+
+### Test 2: Get recommendations for critical deviation
+POST http://localhost:4321/api/aquariums/{{aquariumId}}/recommendations
+Content-Type: application/json
+
+{
+  "parameter_id": "{{parameterId}}",
+  "current_value": 9.2,
+  "optimal_min": 7.8,
+  "optimal_max": 8.3
+}
+
+### Test 3: Normal values (should return minimal recommendations)
+POST http://localhost:4321/api/aquariums/{{aquariumId}}/recommendations
+Content-Type: application/json
+
+{
+  "parameter_id": "{{parameterId}}",
+  "current_value": 8.0,
+  "optimal_min": 7.8,
+  "optimal_max": 8.3
+}
+
+### Test 4: Validation error - missing parameter_id
+POST http://localhost:4321/api/aquariums/{{aquariumId}}/recommendations
+Content-Type: application/json
+
+{
+  "current_value": 8.5,
+  "optimal_min": 7.8,
+  "optimal_max": 8.3
+}
+
+### Test 5: Validation error - invalid UUID
+POST http://localhost:4321/api/aquariums/{{aquariumId}}/recommendations
+Content-Type: application/json
+
+{
+  "parameter_id": "invalid-uuid",
+  "current_value": 8.5,
+  "optimal_min": 7.8,
+  "optimal_max": 8.3
+}
+
+### Test 6: Validation error - optimal_max <= optimal_min
+POST http://localhost:4321/api/aquariums/{{aquariumId}}/recommendations
+Content-Type: application/json
+
+{
+  "parameter_id": "{{parameterId}}",
+  "current_value": 8.5,
+  "optimal_min": 8.5,
+  "optimal_max": 8.0
+}
+
+### Test 7: Invalid aquarium ID format
+POST http://localhost:4321/api/aquariums/not-a-uuid/recommendations
+Content-Type: application/json
+
+{
+  "parameter_id": "{{parameterId}}",
+  "current_value": 8.5,
+  "optimal_min": 7.8,
+  "optimal_max": 8.3
+}
+
+### Test 8: Non-existent aquarium
+POST http://localhost:4321/api/aquariums/00000000-0000-0000-0000-000000000000/recommendations
+Content-Type: application/json
+
+{
+  "parameter_id": "{{parameterId}}",
+  "current_value": 8.5,
+  "optimal_min": 7.8,
+  "optimal_max": 8.3
+}
+
+### Test 9: Non-existent parameter
+POST http://localhost:4321/api/aquariums/{{aquariumId}}/recommendations
+Content-Type: application/json
+
+{
+  "parameter_id": "00000000-0000-0000-0000-000000000000",
+  "current_value": 8.5,
+  "optimal_min": 7.8,
+  "optimal_max": 8.3
+}
+

@@ -8,6 +8,7 @@ import { AIRecommendationDrawer } from "./AIRecommendationDrawer";
 import { AddMeasurementForm } from "./AddMeasurementForm";
 import { Toaster } from "@/components/ui/toast";
 import { useToast } from "@/components/hooks/useToast";
+import { useAIRecommendations } from "@/components/hooks/useAIRecommendations";
 
 export interface DashboardContentProps {
   aquariums: AquariumListItemDTO[];
@@ -28,7 +29,6 @@ export function DashboardContent({
   lastMeasurementTime,
 }: DashboardContentProps) {
   // UI state for drawer
-  const [selectedParameterId, setSelectedParameterId] = useState<string | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   // UI state for add measurement form
@@ -36,6 +36,11 @@ export function DashboardContent({
 
   // Toast notifications
   const { toasts, removeToast, success, error } = useToast();
+
+  // AI Recommendations hook
+  const aiRecommendations = useAIRecommendations({
+    aquariumId: selectedAquariumId || "",
+  });
 
   // Handle add aquarium navigation
   const handleAddAquarium = () => {
@@ -71,21 +76,31 @@ export function DashboardContent({
   }, []);
 
   // Handle parameter card click
-  const handleParameterClick = useCallback((id: string) => {
-    setSelectedParameterId(id);
-    setIsDrawerOpen(true);
-  }, []);
+  const handleParameterClick = useCallback(
+    async (id: string) => {
+      const parameter = parameters.find((p) => p.parameterId === id);
+      if (!parameter || parameter.currentValue === null) {
+        return;
+      }
+
+      setIsDrawerOpen(true);
+
+      // Fetch AI recommendations
+      await aiRecommendations.fetchRecommendations({
+        parameter_id: parameter.parameterId,
+        current_value: parameter.currentValue,
+        optimal_min: parameter.optimalMin,
+        optimal_max: parameter.optimalMax,
+      });
+    },
+    [parameters, aiRecommendations]
+  );
 
   // Handle drawer close
   const handleDrawerClose = useCallback(() => {
     setIsDrawerOpen(false);
-    setSelectedParameterId(null);
-  }, []);
-
-  // Find selected parameter for drawer
-  const selectedParameter = selectedParameterId
-    ? parameters.find((p) => p.parameterId === selectedParameterId) || null
-    : null;
+    aiRecommendations.reset();
+  }, [aiRecommendations]);
 
   // No aquariums state
   if (aquariums.length === 0) {
@@ -138,10 +153,11 @@ export function DashboardContent({
       <ParameterCardsGrid parameters={parameters} onParameterClick={handleParameterClick} />
 
       <AIRecommendationDrawer
-        isOpen={isDrawerOpen}
-        parameter={selectedParameter}
-        aquariumId={selectedAquariumId}
-        onClose={handleDrawerClose}
+        open={isDrawerOpen}
+        onOpenChange={handleDrawerClose}
+        data={aiRecommendations.data}
+        loading={aiRecommendations.loading}
+        error={aiRecommendations.error}
       />
 
       {selectedAquariumId && (

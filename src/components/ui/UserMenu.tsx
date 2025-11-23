@@ -57,7 +57,7 @@ export function UserMenu({ userName }: UserMenuProps) {
           aria-label="User menu"
           disabled={isLoggingOut}
         >
-          <Avatar className="h-12 w-12">
+          <Avatar className="h-13 w-13">
             <AvatarFallback className="bg-gray-900 text-white">{userName}</AvatarFallback>
           </Avatar>
         </Button>
