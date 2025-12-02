@@ -1,0 +1,59 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { AquariumService } from "@/lib/services/aquarium.service";
+import { AquariumGrid } from "@/components/aquariums/AquariumGrid";
+import { DEFAULT_USER_ID } from "@/db/supabase.client";
+import type { AquariumListItemDTO } from "@/types";
+
+// Fetch user's aquariums
+const aquariumService = new AquariumService(Astro.locals.supabase);
+let aquariums: AquariumListItemDTO[] = [];
+let error: string | null = null;
+
+try {
+  aquariums = await aquariumService.listAquariums(DEFAULT_USER_ID);
+} catch (e) {
+  console.error("Failed to fetch aquariums:", e);
+  error = "Failed to load aquariums. Please try again.";
+}
+---
+
+<Layout title="My Aquariums">
+  <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12 max-w-7xl">
+    {/* Page Header */}
+    <div class="mb-8 sm:mb-10 lg:mb-12">
+      <h1 class="text-3xl sm:text-4xl font-bold mb-2 text-foreground">My Aquariums</h1>
+      <p class="text-base sm:text-lg text-muted-foreground">Manage your aquariums and track their water parameters.</p>
+    </div>
+
+    {/* Content */}
+    {
+      error ? (
+        <div class="rounded-lg border border-destructive/50 bg-destructive/10 p-4 sm:p-5">
+          <div class="flex items-start gap-3">
+            <svg
+              class="h-5 w-5 flex-shrink-0 text-destructive mt-0.5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <div class="flex-1">
+              <h5 class="font-semibold text-destructive">Error</h5>
+              <p class="text-sm text-destructive/90">{error}</p>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <AquariumGrid client:load aquariums={aquariums} />
+      )
+    }
+  </main>
+</Layout>

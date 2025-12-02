@@ -55,11 +55,11 @@ New User Registration
 As a new person visiting the application, I want to be able to create an account by providing my email address and password, so that I can access all functionalities.
 ### Acceptance Criteria
 - The home page has a "Sign Up" button.
-- The registration form requires an email address and password (with confirmation).
+- The registration form requires an email address, password (with confirmation) and name.
 - The system validates that the provided email address has the correct format.
 - The system checks that the passwords in both fields are identical.
 - After successful validation and form submission, a new user account is created in the database.
-- The user is automatically logged in and redirected to the view for adding their first aquarium.
+- The user is automatically logged in and redirected to the main dashboard.
 
 ### ID
 US-002
@@ -80,7 +80,7 @@ System Logout
 ### Description
 As a logged-in user, I want to be able to securely log out of the application to end my session.
 ### Acceptance Criteria
-- In the application interface (e.g., in the user menu), there is a visible "Log Out" button.
+- In the top bar, there is a visible "Log Out" button.
 - After clicking the button, the user's session is ended.
 - The user is redirected to the login page or the application's home page.
 
