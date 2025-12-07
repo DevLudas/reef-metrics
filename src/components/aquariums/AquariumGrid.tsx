@@ -13,13 +13,7 @@ export function AquariumGrid({ aquariums }: AquariumGridProps) {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
-        <div className="flex-1">
-          <h2 className="text-2xl font-semibold">Your Aquariums</h2>
-          <p className="text-muted-foreground mt-1">
-            Here is a list of all your aquariums. You can add a new one or manage existing ones.
-          </p>
-        </div>
+      <div className="flex flex-col sm:flex-row justify-end items-start gap-4">
         <AddAquariumButton />
       </div>
 
