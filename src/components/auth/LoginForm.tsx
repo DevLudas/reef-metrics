@@ -1,23 +1,12 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { loginSchema, type LoginFormData } from "@/lib/validation/auth.validation";
 
-const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(1, "Password is required"),
-});
-
-type LoginFormData = z.infer<typeof loginSchema>;
-
-interface LoginFormProps {
-  onSubmit?: (data: LoginFormData) => Promise<void>;
-}
-
-export function LoginForm({ onSubmit }: LoginFormProps) {
+export function LoginForm() {
   const [serverError, setServerError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -38,9 +27,23 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
     setIsLoading(true);
 
     try {
-      if (onSubmit) {
-        await onSubmit(data);
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        setServerError(result.error || "Failed to login");
+        return;
       }
+
+      // Redirect to home page (dashboard) after successful login
+      window.location.href = "/";
     } catch (error) {
       setServerError(error instanceof Error ? error.message : "An error occurred during login");
     } finally {

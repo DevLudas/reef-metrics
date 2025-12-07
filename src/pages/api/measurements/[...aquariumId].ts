@@ -1,7 +1,6 @@
 import { z } from "zod";
 import type { APIRoute } from "astro";
 import { MeasurementsService } from "@/lib/services/measurements.service";
-import { DEFAULT_USER_ID } from "@/db/supabase.client";
 
 // Zod schemas for validation
 const getMeasurementsQuerySchema = z.object({
@@ -48,11 +47,11 @@ export const GET: APIRoute = async ({ params, url, locals }) => {
       );
     }
 
-    const userId = DEFAULT_USER_ID;
-    if (!userId) {
+    const user = locals.user;
+    if (!user) {
       return new Response(
         JSON.stringify({
-          error: { code: "UNAUTHORIZED", message: "Invalid authentication" },
+          error: { code: "UNAUTHORIZED", message: "User not authenticated" },
         }),
         { status: 401, headers: { "Content-Type": "application/json" } }
       );
@@ -92,7 +91,7 @@ export const GET: APIRoute = async ({ params, url, locals }) => {
       }
 
       const { measurements, total } = await measurementsService.getMeasurements(
-        userId,
+        user.id,
         aquariumId,
         {
           start_date: validation.data.start_date,
@@ -168,8 +167,8 @@ export const GET: APIRoute = async ({ params, url, locals }) => {
       }),
       { status: 404, headers: { "Content-Type": "application/json" } }
     );
-  } catch (error: unknown) {
-    if (error instanceof Error && error.message === "NOT_FOUND") {
+  } catch (error: any) {
+    if (error.message === "NOT_FOUND") {
       return new Response(
         JSON.stringify({
           error: { code: "NOT_FOUND", message: "Aquarium not found or access denied" },
@@ -282,8 +281,8 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
       }),
       { status: 404, headers: { "Content-Type": "application/json" } }
     );
-  } catch (error: unknown) {
-    if (error instanceof Error && error.message === "NOT_FOUND") {
+  } catch (error: any) {
+    if (error.message === "NOT_FOUND") {
       return new Response(
         JSON.stringify({
           error: { code: "NOT_FOUND", message: "Aquarium not found or access denied" },

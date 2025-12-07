@@ -3,9 +3,9 @@ import { UserMenu } from "./ui/UserMenu";
 import { Image } from "astro:assets";
 import logo from "@/assets/logo.png";
 
-// Mock user for now - will be replaced with real auth later
-// TODO: Replace with actual user from session
-const mockUserName = "Ludes";
+// Get authenticated user from middleware
+const { user } = Astro.locals;
+const userName = user?.email || "Guest";
 ---
 
 <header class="sticky top-0 z-50 w-full border-b border-gray-200 bg-white">
@@ -18,7 +18,7 @@ const mockUserName = "Ludes";
       </a>
 
       <!-- User menu -->
-      <UserMenu client:load userName={mockUserName} />
+      <UserMenu client:load userName={userName} />
     </nav>
   </div>
 </header>

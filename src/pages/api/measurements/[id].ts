@@ -1,7 +1,6 @@
 import { z } from "zod";
 import type { APIRoute } from "astro";
 import { MeasurementsService } from "@/lib/services/measurements.service";
-import { DEFAULT_USER_ID } from "@/db/supabase.client";
 
 // Zod schemas for validation
 const updateMeasurementBodySchema = z.object({
@@ -24,11 +23,11 @@ export const GET: APIRoute = async ({ params, locals }) => {
       );
     }
 
-    const userId = DEFAULT_USER_ID;
-    if (!userId) {
+    const user = locals.user;
+    if (!user) {
       return new Response(
         JSON.stringify({
-          error: { code: "UNAUTHORIZED", message: "Invalid authentication" },
+          error: { code: "UNAUTHORIZED", message: "User not authenticated" },
         }),
         { status: 401, headers: { "Content-Type": "application/json" } }
       );
@@ -47,7 +46,7 @@ export const GET: APIRoute = async ({ params, locals }) => {
     }
 
     // GET /api/measurements/:id
-    const measurement = await measurementsService.getMeasurement(userId, measurementId);
+    const measurement = await measurementsService.getMeasurement(user.id, measurementId);
 
     return new Response(JSON.stringify({ data: measurement }), {
       status: 200,
@@ -162,11 +161,11 @@ export const DELETE: APIRoute = async ({ params, locals }) => {
       );
     }
 
-    const userId = DEFAULT_USER_ID;
-    if (!userId) {
+    const user = locals.user;
+    if (!user) {
       return new Response(
         JSON.stringify({
-          error: { code: "UNAUTHORIZED", message: "Invalid authentication" },
+          error: { code: "UNAUTHORIZED", message: "User not authenticated" },
         }),
         { status: 401, headers: { "Content-Type": "application/json" } }
       );
@@ -185,7 +184,7 @@ export const DELETE: APIRoute = async ({ params, locals }) => {
     }
 
     // DELETE /api/measurements/:id
-    await measurementsService.deleteMeasurement(userId, measurementId);
+    await measurementsService.deleteMeasurement(user.id, measurementId);
 
     return new Response(null, { status: 204 });
   } catch (error: unknown) {

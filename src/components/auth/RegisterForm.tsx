@@ -1,30 +1,12 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { registerSchema, type RegisterFormData } from "@/lib/validation/auth.validation";
 
-const registerSchema = z
-  .object({
-    username: z.string().min(3, "Username must be at least 3 characters").max(50, "Username is too long"),
-    email: z.string().email("Please enter a valid email address"),
-    password: z.string().min(8, "Password must be at least 8 characters"),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  });
-
-type RegisterFormData = z.infer<typeof registerSchema>;
-
-interface RegisterFormProps {
-  onSubmit?: (data: Omit<RegisterFormData, "confirmPassword">) => Promise<void>;
-}
-
-export function RegisterForm({ onSubmit }: RegisterFormProps) {
+export function RegisterForm() {
   const [serverError, setServerError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -35,7 +17,6 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      username: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -47,9 +28,27 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
     setIsLoading(true);
 
     try {
-      if (onSubmit) {
-        await onSubmit(data as Omit<typeof data, "confirmPassword">);
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+          confirmPassword: data.confirmPassword,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        setServerError(result.error || "Failed to register");
+        return;
       }
+
+      // Redirect to aquariums page after successful registration
+      window.location.href = "/aquariums";
     } catch (error) {
       setServerError(error instanceof Error ? error.message : "An error occurred during registration");
     } finally {
@@ -66,32 +65,6 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
         </div>
       )}
 
-      {/* Username Field */}
-      <div className="space-y-2">
-        <Label htmlFor="username" className="text-sm font-medium">
-          Username <span className="text-destructive">*</span>
-        </Label>
-        <Input
-          id="username"
-          type="text"
-          placeholder="johndoe"
-          disabled={isLoading}
-          className="w-full"
-          {...register("username")}
-        />
-        {errors.username && (
-          <p className="text-sm text-destructive flex items-center gap-1">
-            <svg className="h-4 w-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fillRule="evenodd"
-                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                clipRule="evenodd"
-              />
-            </svg>
-            {errors.username.message}
-          </p>
-        )}
-      </div>
 
       {/* Email Field */}
       <div className="space-y-2">

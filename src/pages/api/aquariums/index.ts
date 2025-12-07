@@ -1,7 +1,6 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
 import { AquariumService } from "@/lib/services/aquarium.service";
-import { DEFAULT_USER_ID } from "@/db/supabase.client";
 import { errorResponse } from "@/lib/utils";
 import type { CreateAquariumCommand, CreateAquariumResponseDTO, AquariumsListResponseDTO } from "@/types";
 
@@ -21,7 +20,13 @@ const listQuerySchema = z.object({
 
 export const GET: APIRoute = async ({ request, locals }) => {
   try {
-    // Step 1: Validate query parameters
+    // Step 1: Get authenticated user
+    const user = locals.user;
+    if (!user) {
+      return errorResponse("UNAUTHORIZED", "User not authenticated", 401);
+    }
+
+    // Step 2: Validate query parameters
     const url = new URL(request.url);
     const queryParams = {
       sort: url.searchParams.get("sort") || undefined,
@@ -43,12 +48,9 @@ export const GET: APIRoute = async ({ request, locals }) => {
 
     const { sort, order } = validation.data;
 
-    // Step 2: Get user ID
-    const userId = DEFAULT_USER_ID;
-
     // Step 3: Call service.listAquariums()
     const aquariumService = new AquariumService(locals.supabase);
-    const aquariums = await aquariumService.listAquariums(userId, sort, order);
+    const aquariums = await aquariumService.listAquariums(user.id, sort, order);
 
     // Step 4: Return 200 with AquariumsListResponseDTO
     return new Response(
@@ -67,8 +69,11 @@ export const GET: APIRoute = async ({ request, locals }) => {
 
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
-    // Step 1: Use default user ID (authentication removed for this stage)
-    const userId = DEFAULT_USER_ID;
+    // Step 1: Get authenticated user
+    const user = locals.user;
+    if (!user) {
+      return errorResponse("UNAUTHORIZED", "User not authenticated", 401);
+    }
 
     // Step 2: Parse and validate request body
     const body = await request.json();
@@ -90,7 +95,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     // Step 3: Create aquarium via service
     const aquariumService = new AquariumService(locals.supabase);
-    const aquarium = await aquariumService.createAquarium(userId, command);
+    const aquarium = await aquariumService.createAquarium(user.id, command);
 
     // Step 4: Return success response
     return new Response(

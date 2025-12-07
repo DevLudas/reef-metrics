@@ -2,9 +2,14 @@
 import Layout from "@/layouts/Layout.astro";
 import { DashboardContent } from "@/components/dashboard/DashboardContent";
 import DashboardService from "@/lib/services/dashboard.service";
-// For now, we'll use a mock user ID until authentication is implemented
-// TODO: Replace with actual user ID from session
-import { DEFAULT_USER_ID } from "@/db/supabase.client";
+
+// Get authenticated user from middleware
+const { user } = Astro.locals;
+
+// This page is protected by middleware, so user should always exist
+if (!user) {
+  return Astro.redirect("/login");
+}
 
 // Get preferred aquarium from URL parameter
 const preferredAquariumId = Astro.url.searchParams.get("aquarium");
@@ -17,7 +22,7 @@ let dashboardData;
 let error: string | null = null;
 
 try {
-  dashboardData = await dashboardService.getDashboardData(DEFAULT_USER_ID, preferredAquariumId);
+  dashboardData = await dashboardService.getDashboardData(user.id, preferredAquariumId);
 } catch (err) {
   error = err instanceof Error ? err.message : "Failed to load dashboard";
 }

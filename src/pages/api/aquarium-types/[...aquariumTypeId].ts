@@ -1,7 +1,6 @@
 import type { APIRoute } from "astro";
 import { ReferenceDataService } from "@/lib/services/reference-data.service";
 import { aquariumTypeIdParamSchema } from "@/lib/validation/reference-data.validation";
-import { DEFAULT_USER_ID } from "@/db/supabase.client";
 
 export const prerender = false;
 
@@ -17,11 +16,11 @@ export const GET: APIRoute = async ({ params, locals }) => {
       );
     }
 
-    const userId = DEFAULT_USER_ID;
-    if (!userId) {
+    const user = locals.user;
+    if (!user) {
       return new Response(
         JSON.stringify({
-          error: { code: "UNAUTHORIZED", message: "Invalid authentication" },
+          error: { code: "UNAUTHORIZED", message: "User not authenticated" },
         }),
         { status: 401, headers: { "Content-Type": "application/json" } }
       );
