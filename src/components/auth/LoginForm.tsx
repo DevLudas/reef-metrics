@@ -42,8 +42,8 @@ export function LoginForm() {
         return;
       }
 
-      // Redirect to home page (dashboard) after successful login
-      window.location.href = "/";
+      // Redirect to measurements dashboard after successful login
+      window.location.href = "/dashboard";
     } catch (error) {
       setServerError(error instanceof Error ? error.message : "An error occurred during login");
     } finally {

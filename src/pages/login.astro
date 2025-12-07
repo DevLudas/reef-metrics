@@ -4,10 +4,10 @@ import { LoginForm } from "@/components/auth";
 
 const pageTitle = "Log In - Reef Metrics";
 
-// Redirect authenticated users to home page
+// Redirect authenticated users to measurements dashboard
 const { user } = Astro.locals;
 if (user) {
-  return Astro.redirect("/");
+  return Astro.redirect("/dashboard");
 }
 ---
 

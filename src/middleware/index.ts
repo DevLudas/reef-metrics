@@ -5,6 +5,7 @@ import { supabaseClient, createSupabaseServerInstance } from "../db/supabase.cli
 // Public paths - Auth API endpoints & Server-Rendered Astro Pages
 const PUBLIC_PATHS = [
   // Server-Rendered Astro Pages
+  "/",
   "/login",
   "/register",
   "/forgot-password",
@@ -15,6 +16,13 @@ const PUBLIC_PATHS = [
   "/api/auth/logout",
   "/api/auth/forgot-password",
   "/api/auth/reset-password",
+];
+
+// Protected paths - require authentication
+const PROTECTED_PATHS = [
+  "/dashboard",
+  "/aquariums",
+  "/profile",
 ];
 
 export const onRequest = defineMiddleware(async (context, next) => {
