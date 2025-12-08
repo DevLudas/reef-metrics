@@ -132,7 +132,7 @@ class DashboardService {
   /**
    * Group measurements by parameter, keeping only the most recent for each
    */
-  private groupLatestMeasurementsByParameter(measurements: any[]): LatestMeasurementDTO[] {
+  private groupLatestMeasurementsByParameter(measurements: LatestMeasurementDTO[]): LatestMeasurementDTO[] {
     const latestByParameter = new Map<string, LatestMeasurementDTO>();
 
     for (const measurement of measurements) {

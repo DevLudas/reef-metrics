@@ -35,7 +35,7 @@ interface JSONSchema {
 /**
  * Response format configuration for structured outputs
  */
-export interface ResponseFormat<T> {
+export interface ResponseFormat {
   type: "json_schema";
   json_schema: {
     name: string;
@@ -386,6 +386,7 @@ export class OpenRouterService {
     }
 
     if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
       console[level](JSON.stringify(logEntry, null, 2));
     }
   }

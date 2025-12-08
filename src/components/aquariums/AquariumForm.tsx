@@ -9,7 +9,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 
-
 interface AquariumFormProps {
   onSubmit: (data: CreateAquariumCommand) => Promise<void>;
   onSuccess?: () => void;
@@ -17,7 +16,7 @@ interface AquariumFormProps {
   isSubmitting?: boolean;
 }
 
-export function AquariumForm({ onSubmit, onSuccess, initialData, isSubmitting = false }: AquariumFormProps) {
+export function AquariumForm({ onSubmit, initialData, isSubmitting = false }: AquariumFormProps) {
   const [aquariumTypes, setAquariumTypes] = useState<AquariumTypeDTO[]>([]);
   const [isLoadingTypes, setIsLoadingTypes] = useState(true);
 
@@ -58,8 +57,8 @@ export function AquariumForm({ onSubmit, onSuccess, initialData, isSubmitting = 
         }
         const result = await response.json();
         setAquariumTypes(result.data || []);
-      } catch (error) {
-        console.error("Error fetching aquarium types:", error);
+      } catch {
+        // Error fetching aquarium types - will show empty list
       } finally {
         setIsLoadingTypes(false);
       }

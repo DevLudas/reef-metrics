@@ -137,7 +137,7 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
 
       {/* Sign up link */}
       <p className="text-center text-sm text-muted-foreground">
-        Don't have an account?{" "}
+        Don&rsquo;t have an account?{" "}
         <a href="/register" className="text-primary font-medium hover:underline">
           Sign up
         </a>
@@ -145,4 +145,3 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
     </form>
   );
 }
-

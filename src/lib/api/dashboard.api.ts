@@ -102,7 +102,10 @@ export class DashboardAPI {
    * @returns Created measurements
    * @throws Error if request fails or validation fails
    */
-  async createBulkMeasurements(aquariumId: string, command: BulkCreateMeasurementsCommand): Promise<any> {
+  async createBulkMeasurements(
+    aquariumId: string,
+    command: BulkCreateMeasurementsCommand
+  ): Promise<Record<string, unknown>> {
     const response = await fetch(`/api/measurements/${aquariumId}/bulk`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

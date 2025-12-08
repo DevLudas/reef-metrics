@@ -41,7 +41,7 @@ export function UserMenu({ userName }: UserMenuProps) {
 
         // Redirect to home page after logout
         window.location.href = "/";
-      } catch (error) {
+      } catch {
         setIsLoggingOut(false);
       }
     });

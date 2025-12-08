@@ -39,7 +39,7 @@ DashboardPage (index.astro)
 
 - **Handled events**: None (server-rendered)
 
-- **Validation conditions**: 
+- **Validation conditions**:
   - User must be authenticated (handled by middleware)
 
 - **Types**:
@@ -191,7 +191,7 @@ DashboardPage (index.astro)
 - **Props**:
   ```typescript
   interface EmptyStateProps {
-    type: 'no-aquariums' | 'no-measurements';
+    type: "no-aquariums" | "no-measurements";
     onAddAquarium?: () => void;
     onAddMeasurement?: () => void;
   }
@@ -354,6 +354,7 @@ DashboardPage (index.astro)
 All API interaction types are already defined in `src/types.ts`:
 
 - **`AquariumListItemDTO`**: Aquarium data for list views
+
   ```typescript
   {
     id: string;
@@ -367,11 +368,12 @@ All API interaction types are already defined in `src/types.ts`:
     aquarium_type: {
       id: string;
       name: string;
-    };
+    }
   }
   ```
 
 - **`LatestMeasurementDTO`**: Latest measurement data for each parameter
+
   ```typescript
   {
     id: string;
@@ -386,11 +388,12 @@ All API interaction types are already defined in `src/types.ts`:
       name: string;
       full_name: string;
       unit: string;
-    };
+    }
   }
   ```
 
 - **`DefaultOptimalValueWithParameterDTO`**: Optimal ranges for parameters
+
   ```typescript
   {
     id: string;
@@ -401,11 +404,12 @@ All API interaction types are already defined in `src/types.ts`:
       name: string;
       full_name: string;
       unit: string;
-    };
+    }
   }
   ```
 
 - **`RecommendationDTO`**: AI recommendation response
+
   ```typescript
   {
     parameter: {
@@ -429,7 +433,7 @@ All API interaction types are already defined in `src/types.ts`:
 
 - **`ParameterStatus`**: Status enum
   ```typescript
-  type ParameterStatus = 'normal' | 'warning' | 'critical' | 'no_data';
+  type ParameterStatus = "normal" | "warning" | "critical" | "no_data";
   ```
 
 ### 5.2 New ViewModel Types
@@ -437,6 +441,7 @@ All API interaction types are already defined in `src/types.ts`:
 Create new types in a dedicated section of `src/types.ts` or in a new file `src/components/dashboard/types.ts`:
 
 - **`ParameterStatusViewModel`**: Combined view model for parameter card display
+
   ```typescript
   interface ParameterStatusViewModel {
     parameterId: string;
@@ -453,6 +458,7 @@ Create new types in a dedicated section of `src/types.ts` or in a new file `src/
   ```
 
 - **`DashboardViewModel`**: Main view model for dashboard state
+
   ```typescript
   interface DashboardViewModel {
     aquariums: AquariumListItemDTO[];
@@ -466,7 +472,7 @@ Create new types in a dedicated section of `src/types.ts` or in a new file `src/
 
 - **`DashboardEmptyStateType`**: Type for empty state variants
   ```typescript
-  type DashboardEmptyStateType = 'no-aquariums' | 'no-measurements' | 'loading' | null;
+  type DashboardEmptyStateType = "no-aquariums" | "no-measurements" | "loading" | null;
   ```
 
 ## 6. State Management
@@ -478,6 +484,7 @@ Create a custom hook `src/components/dashboard/hooks/useDashboard.ts` to encapsu
 **Purpose**: Centralize data fetching, state management, and business logic for the dashboard view.
 
 **State Variables**:
+
 - `aquariums`: `AquariumListItemDTO[]` - List of user's aquariums
 - `selectedAquariumId`: `string | null` - Currently selected aquarium
 - `measurements`: `LatestMeasurementDTO[]` - Latest measurements for selected aquarium
@@ -489,6 +496,7 @@ Create a custom hook `src/components/dashboard/hooks/useDashboard.ts` to encapsu
 - `isDrawerOpen`: `boolean` - Drawer state
 
 **Effects**:
+
 1. **Load aquariums on mount**: Fetch user's aquariums via `GET /api/aquariums`
 2. **Set initial selected aquarium**: Select first aquarium or restore from localStorage
 3. **Load measurements when aquarium changes**: Fetch via `GET /api/aquariums/:id/measurements/latest`
@@ -496,6 +504,7 @@ Create a custom hook `src/components/dashboard/hooks/useDashboard.ts` to encapsu
 5. **Calculate parameter statuses**: Combine measurements and optimal values into `ParameterStatusViewModel[]`
 
 **Functions**:
+
 - `handleAquariumChange(aquariumId: string)`: Update selected aquarium and persist to localStorage
 - `handleParameterClick(parameterId: string)`: Open drawer with selected parameter
 - `handleDrawerClose()`: Close drawer
@@ -503,6 +512,7 @@ Create a custom hook `src/components/dashboard/hooks/useDashboard.ts` to encapsu
 - `calculateStatus(value: number, min: number, max: number)`: Calculate parameter status
 
 **Return Value**:
+
 ```typescript
 {
   aquariums: AquariumListItemDTO[];
@@ -561,37 +571,34 @@ import type {
   DefaultOptimalValuesForTypeResponseDTO,
   RecommendationResponseDTO,
   GetRecommendationsCommand,
-} from '@/types';
+} from "@/types";
 
 export class DashboardAPI {
   async getAquariums(): Promise<AquariumsListResponseDTO> {
-    const response = await fetch('/api/aquariums?sort=created_at&order=desc');
-    if (!response.ok) throw new Error('Failed to fetch aquariums');
+    const response = await fetch("/api/aquariums?sort=created_at&order=desc");
+    if (!response.ok) throw new Error("Failed to fetch aquariums");
     return response.json();
   }
 
   async getLatestMeasurements(aquariumId: string): Promise<LatestMeasurementsResponseDTO> {
     const response = await fetch(`/api/aquariums/${aquariumId}/measurements/latest`);
-    if (!response.ok) throw new Error('Failed to fetch measurements');
+    if (!response.ok) throw new Error("Failed to fetch measurements");
     return response.json();
   }
 
   async getOptimalValues(aquariumTypeId: string): Promise<DefaultOptimalValuesForTypeResponseDTO> {
     const response = await fetch(`/api/aquarium-types/${aquariumTypeId}/optimal-values`);
-    if (!response.ok) throw new Error('Failed to fetch optimal values');
+    if (!response.ok) throw new Error("Failed to fetch optimal values");
     return response.json();
   }
 
-  async getRecommendations(
-    aquariumId: string,
-    command: GetRecommendationsCommand
-  ): Promise<RecommendationResponseDTO> {
+  async getRecommendations(aquariumId: string, command: GetRecommendationsCommand): Promise<RecommendationResponseDTO> {
     const response = await fetch(`/api/aquariums/${aquariumId}/recommendations`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(command),
     });
-    if (!response.ok) throw new Error('Failed to fetch recommendations');
+    if (!response.ok) throw new Error("Failed to fetch recommendations");
     return response.json();
   }
 }
@@ -600,6 +607,7 @@ export class DashboardAPI {
 ### 7.3 Error Handling
 
 All API calls should handle:
+
 - **401 Unauthorized**: Redirect to login
 - **403 Forbidden**: Show error message
 - **404 Not Found**: Show appropriate empty state
@@ -609,48 +617,54 @@ All API calls should handle:
 ## 8. User Interactions
 
 ### 8.1 Aquarium Selection
+
 - **Trigger**: User clicks on aquarium selector dropdown
 - **Action**: Display list of aquariums with names and types
-- **Result**: 
+- **Result**:
   - Selected aquarium ID is updated
   - Dashboard reloads with new aquarium's data
   - Selection is persisted to localStorage
   - Loading skeleton shown during data fetch
 
 ### 8.2 Parameter Card Click
+
 - **Trigger**: User clicks on any parameter card
-- **Action**: 
+- **Action**:
   - Open AI recommendation drawer from right
   - Show loading state in drawer
   - Fetch AI recommendations for the parameter
-- **Result**: 
+- **Result**:
   - Drawer slides in with animation
   - Display parameter analysis and recommendations
   - Focus is trapped within drawer
   - Background content is dimmed with overlay
 
 ### 8.3 Close Drawer
+
 - **Trigger**: User clicks close button, ESC key, or overlay
 - **Action**: Close drawer with animation
-- **Result**: 
+- **Result**:
   - Drawer slides out
   - Focus returns to the parameter card that opened it
   - Overlay fades out
 
 ### 8.4 Add Measurement
+
 - **Trigger**: User clicks "Add Measurement" button
 - **Action**: Open bulk measurement form modal
-- **Result**: 
+- **Result**:
   - Modal appears with form for all parameters
   - User can enter values
   - On save, dashboard refreshes with new data
 
 ### 8.5 Add First Aquarium
+
 - **Trigger**: User clicks "Add Your First Aquarium" in empty state
 - **Action**: Navigate to aquarium creation page
 - **Result**: User is redirected to `/aquariums/new` or similar
 
 ### 8.6 Add First Measurement
+
 - **Trigger**: User clicks "Add Your First Measurement" in empty state
 - **Action**: Open bulk measurement form
 - **Result**: Form modal appears for data entry
@@ -700,15 +714,15 @@ function calculateStatus(
   optimalMax: number
 ): { status: ParameterStatus; deviationPercentage: number | null } {
   if (currentValue === null) {
-    return { status: 'no_data', deviationPercentage: null };
+    return { status: "no_data", deviationPercentage: null };
   }
 
   // Calculate midpoint of optimal range
   const optimalMid = (optimalMin + optimalMax) / 2;
-  
+
   // Calculate deviation percentage
   let deviation: number;
-  
+
   if (currentValue < optimalMin) {
     deviation = ((optimalMin - currentValue) / optimalMin) * 100;
   } else if (currentValue > optimalMax) {
@@ -720,11 +734,11 @@ function calculateStatus(
 
   // Determine status based on deviation thresholds
   if (deviation < 10) {
-    return { status: 'normal', deviationPercentage: deviation };
+    return { status: "normal", deviationPercentage: deviation };
   } else if (deviation < 20) {
-    return { status: 'warning', deviationPercentage: deviation };
+    return { status: "warning", deviationPercentage: deviation };
   } else {
-    return { status: 'critical', deviationPercentage: deviation };
+    return { status: "critical", deviationPercentage: deviation };
   }
 }
 ```
@@ -819,12 +833,14 @@ function calculateStatus(
 ## 11. Implementation Steps
 
 ### Step 1: Create Type Definitions
+
 1. Add `ParameterStatusViewModel` to `src/types.ts`
 2. Add `DashboardViewModel` to `src/types.ts`
 3. Add `DashboardEmptyStateType` to `src/types.ts`
 4. Export all new types
 
 ### Step 2: Create API Client
+
 1. Create `src/lib/api/dashboard.api.ts`
 2. Implement `DashboardAPI` class with methods:
    - `getAquariums()`
@@ -834,6 +850,7 @@ function calculateStatus(
 3. Add proper error handling and type annotations
 
 ### Step 3: Create Utility Functions
+
 1. Create `src/lib/utils/parameter-status.ts`
 2. Implement `calculateStatus()` function
 3. Implement `calculateDeviation()` function
@@ -841,6 +858,7 @@ function calculateStatus(
 5. Add unit tests for calculation logic
 
 ### Step 4: Create Custom Hook
+
 1. Create `src/components/dashboard/hooks/useDashboard.ts`
 2. Implement state management with `useState`:
    - aquariums, selectedAquariumId, measurements, optimalValues, parameters
@@ -857,12 +875,14 @@ function calculateStatus(
 6. Add localStorage integration for selected aquarium
 
 ### Step 5: Create Empty State Components
+
 1. Create `src/components/dashboard/NoAquariumsEmptyState.tsx`
 2. Create `src/components/dashboard/NoMeasurementsEmptyState.tsx`
 3. Use Shadcn/ui components for consistent styling
 4. Add proper ARIA labels and semantic HTML
 
 ### Step 6: Create Aquarium Selector Component
+
 1. Create `src/components/dashboard/AquariumSelector.tsx`
 2. Use Shadcn/ui Select or custom dropdown component
 3. Implement keyboard navigation (arrow keys, Enter, Escape)
@@ -870,6 +890,7 @@ function calculateStatus(
 5. Style with Tailwind classes
 
 ### Step 7: Create Parameter Card Component
+
 1. Create `src/components/dashboard/ParameterCard.tsx`
 2. Use Shadcn/ui Card component
 3. Implement status-based styling (border color, icon)
@@ -879,6 +900,7 @@ function calculateStatus(
 7. Make keyboard accessible (Enter/Space to activate)
 
 ### Step 8: Create Parameter Cards Grid Component
+
 1. Create `src/components/dashboard/ParameterCardsGrid.tsx`
 2. Implement responsive CSS Grid layout:
    - 1 column on mobile (`grid-cols-1`)
@@ -888,6 +910,7 @@ function calculateStatus(
 4. Map parameters to ParameterCard components
 
 ### Step 9: Create AI Recommendation Drawer Component
+
 1. Create `src/components/dashboard/AIRecommendationDrawer.tsx`
 2. Implement drawer/sheet component (may use Shadcn/ui Sheet if available)
 3. Add slide-in animation from right
@@ -899,6 +922,7 @@ function calculateStatus(
 9. Ensure ARIA attributes for accessibility
 
 ### Step 10: Create Dashboard Header Component
+
 1. Create `src/components/dashboard/DashboardHeader.tsx`
 2. Layout with flex container
 3. Include AquariumSelector and AddMeasurementButton
@@ -906,6 +930,7 @@ function calculateStatus(
 5. Make responsive (stack on mobile)
 
 ### Step 11: Create Dashboard Content Component
+
 1. Create `src/components/dashboard/DashboardContent.tsx`
 2. Integrate useDashboard hook
 3. Implement conditional rendering logic:
@@ -918,18 +943,21 @@ function calculateStatus(
 6. Add error boundary for graceful error handling
 
 ### Step 12: Create Loading Skeleton Components
+
 1. Create `src/components/dashboard/DashboardSkeleton.tsx`
 2. Create skeleton for header
 3. Create skeleton cards grid (6-8 cards)
 4. Use Tailwind animate-pulse for loading animation
 
 ### Step 13: Update Main Dashboard Page
+
 1. Update `src/pages/index.astro`
 2. Check authentication via middleware
 3. Render DashboardContent with client:load directive
 4. Pass necessary props from Astro context (userId if needed)
 
 ### Step 14: Add Measurement Form Modal (if not exists)
+
 1. Create `src/components/measurements/MeasurementFormModal.tsx`
 2. Implement form with fields for all parameters
 3. Use Shadcn/ui Form components
@@ -938,6 +966,7 @@ function calculateStatus(
 6. Emit event on successful save for parent to refresh
 
 ### Step 15: Implement AI Recommendation Endpoint (if needed)
+
 1. Create `src/pages/api/aquariums/[aquariumId]/recommendations.ts`
 2. Implement POST handler
 3. Validate request body using Zod
@@ -945,6 +974,7 @@ function calculateStatus(
 5. Return RecommendationDTO response
 
 ### Step 16: Styling and Polish
+
 1. Apply consistent spacing using Tailwind
 2. Ensure responsive design works on all breakpoints
 3. Add transitions and animations:
@@ -955,6 +985,7 @@ function calculateStatus(
 5. Ensure focus indicators are visible
 
 ### Step 17: Accessibility Testing
+
 1. Test keyboard navigation through all interactive elements
 2. Verify screen reader compatibility
 3. Check focus trap in drawer
@@ -963,6 +994,7 @@ function calculateStatus(
 6. Verify color contrast ratios meet WCAG AA standards
 
 ### Step 18: Error Handling Testing
+
 1. Test all error scenarios:
    - Network failures
    - 401/403/404/500 responses
@@ -972,6 +1004,7 @@ function calculateStatus(
 3. Test retry mechanisms
 
 ### Step 19: Integration Testing
+
 1. Test complete user flows:
    - Login → View dashboard → Select aquarium → View parameters
    - Click parameter → View recommendations → Close drawer
@@ -982,6 +1015,7 @@ function calculateStatus(
 3. Test with multiple aquariums and switching
 
 ### Step 20: Performance Optimization
+
 1. Implement proper React.memo for components that don't need frequent re-renders
 2. Use useCallback for event handlers passed to children
 3. Use useMemo for expensive calculations (status calculation)
@@ -989,6 +1023,7 @@ function calculateStatus(
 5. Optimize API calls (debounce, cache, etc.)
 
 ### Step 21: Documentation
+
 1. Add JSDoc comments to all components
 2. Document props interfaces
 3. Add README for dashboard component directory
@@ -996,10 +1031,10 @@ function calculateStatus(
 5. Add comments for complex business logic
 
 ### Step 22: Final Review and Testing
+
 1. Code review with team
 2. Test on different browsers (Chrome, Firefox, Safari, Edge)
 3. Test on different devices (mobile, tablet, desktop)
 4. Verify all acceptance criteria from user stories are met
 5. Performance testing (Lighthouse, Web Vitals)
 6. Security review (XSS, CSRF protection)
-

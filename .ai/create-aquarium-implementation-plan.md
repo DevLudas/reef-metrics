@@ -7,6 +7,7 @@ This endpoint allows authenticated users to create a new aquarium by providing i
 **Purpose**: Enable users to add new aquariums to their account for tracking water parameters.
 
 **Key Features**:
+
 - User authentication required
 - Automatic user_id assignment from authenticated session
 - Unique aquarium name enforcement per user
@@ -23,14 +24,17 @@ This endpoint allows authenticated users to create a new aquarium by providing i
 ### Parameters
 
 #### Required:
+
 - `name` (string): User-defined aquarium name, minimum 1 character
 - `aquarium_type_id` (UUID string): Reference to a valid aquarium type
 
 #### Optional:
+
 - `description` (string): Aquarium description or notes
 - `volume` (number): Tank volume in liters, must be positive if provided
 
 ### Request Body Example:
+
 ```json
 {
   "name": "My Reef Tank",
@@ -43,6 +47,7 @@ This endpoint allows authenticated users to create a new aquarium by providing i
 ## 3. Used Types
 
 ### Command Model (Input Validation):
+
 ```typescript
 // From src/types.ts
 interface CreateAquariumCommand {
@@ -54,6 +59,7 @@ interface CreateAquariumCommand {
 ```
 
 ### Response DTO:
+
 ```typescript
 // From src/types.ts
 type CreateAquariumResponseDTO = ApiResponseDTO<Omit<AquariumDTO, "aquarium_type"> & { aquarium_type?: never }>;
@@ -69,11 +75,12 @@ interface CreateAquariumResponseDTO {
     volume: number | null;
     created_at: string;
     updated_at: string;
-  }
+  };
 }
 ```
 
 ### Database Types:
+
 ```typescript
 // From src/types.ts
 type AquariumInsert = Tables["aquariums"]["Insert"];
@@ -81,6 +88,7 @@ type AquariumEntity = Tables["aquariums"]["Row"];
 ```
 
 ### Error Response:
+
 ```typescript
 // From src/types.ts
 interface ErrorResponseDTO {
@@ -95,6 +103,7 @@ interface ErrorResponseDTO {
 ## 4. Response Details
 
 ### Success Response (201 Created):
+
 ```json
 {
   "data": {
@@ -113,6 +122,7 @@ interface ErrorResponseDTO {
 ### Error Responses:
 
 #### 401 Unauthorized:
+
 ```json
 {
   "error": {
@@ -123,6 +133,7 @@ interface ErrorResponseDTO {
 ```
 
 #### 400 Bad Request (Validation Error):
+
 ```json
 {
   "error": {
@@ -143,6 +154,7 @@ interface ErrorResponseDTO {
 ```
 
 #### 404 Not Found (Invalid Aquarium Type):
+
 ```json
 {
   "error": {
@@ -153,6 +165,7 @@ interface ErrorResponseDTO {
 ```
 
 #### 409 Conflict (Duplicate Name):
+
 ```json
 {
   "error": {
@@ -163,6 +176,7 @@ interface ErrorResponseDTO {
 ```
 
 #### 500 Internal Server Error:
+
 ```json
 {
   "error": {
@@ -191,28 +205,26 @@ interface ErrorResponseDTO {
 
 ```typescript
 // 1. Validate aquarium type exists
-const { data: aquariumType } = await supabase
-  .from('aquarium_types')
-  .select('id')
-  .eq('id', aquarium_type_id)
-  .single();
+const { data: aquariumType } = await supabase.from("aquarium_types").select("id").eq("id", aquarium_type_id).single();
 
 // 2. Insert new aquarium
 const { data: aquarium } = await supabase
-  .from('aquariums')
+  .from("aquariums")
   .insert({
     user_id,
     name,
     aquarium_type_id,
     description,
-    volume
+    volume,
   })
   .select()
   .single();
 ```
 
 ### Service Layer Responsibility:
+
 The `AquariumService.createAquarium()` method should:
+
 - Accept validated CreateAquariumCommand and user_id
 - Validate aquarium type exists
 - Insert aquarium record
@@ -222,25 +234,30 @@ The `AquariumService.createAquarium()` method should:
 ## 6. Security Considerations
 
 ### Authentication:
+
 - **Requirement**: User must be authenticated before accessing endpoint
 - **Implementation**: Check `context.locals.supabase.auth.getUser()` at endpoint start
 - **Error**: Return 401 if user not authenticated
 
 ### Authorization:
+
 - **User Isolation**: RLS policies ensure users can only create aquariums for themselves
 - **Implementation**: Use authenticated user's ID from auth context, never from request body
 - **Database Level**: RLS policy checks `auth.uid() = user_id` on INSERT
 
 ### Data Validation:
+
 - **Input Sanitization**: Zod schema validates all input data types and constraints
 - **SQL Injection**: Protected by Supabase parameterized queries
 - **XSS Prevention**: No HTML rendering of user input in this endpoint
 
 ### Rate Limiting:
+
 - **Consideration**: Implement rate limiting at middleware level (future enhancement)
 - **Current**: Rely on Supabase built-in protections
 
 ### Foreign Key Validation:
+
 - **Security**: Prevent insertion of aquariums with non-existent types
 - **Implementation**: Explicitly validate aquarium_type_id exists before insertion
 - **Reason**: Provides better error messages and prevents database errors
@@ -248,72 +265,97 @@ The `AquariumService.createAquarium()` method should:
 ## 7. Error Handling
 
 ### Authentication Errors (401):
+
 **Scenario**: User not authenticated
+
 ```typescript
-const { data: { user }, error: authError } = await supabase.auth.getUser();
+const {
+  data: { user },
+  error: authError,
+} = await supabase.auth.getUser();
 if (authError || !user) {
-  return new Response(JSON.stringify({
-    error: {
-      code: 'UNAUTHORIZED',
-      message: 'Authentication required'
-    }
-  }), { status: 401 });
+  return new Response(
+    JSON.stringify({
+      error: {
+        code: "UNAUTHORIZED",
+        message: "Authentication required",
+      },
+    }),
+    { status: 401 }
+  );
 }
 ```
 
 ### Validation Errors (400):
+
 **Scenario**: Invalid input data
+
 ```typescript
 const validation = createAquariumSchema.safeParse(await request.json());
 if (!validation.success) {
-  return new Response(JSON.stringify({
-    error: {
-      code: 'VALIDATION_ERROR',
-      message: 'Invalid input data',
-      details: validation.error.errors.map(err => ({
-        field: err.path.join('.'),
-        message: err.message
-      }))
-    }
-  }), { status: 400 });
+  return new Response(
+    JSON.stringify({
+      error: {
+        code: "VALIDATION_ERROR",
+        message: "Invalid input data",
+        details: validation.error.errors.map((err) => ({
+          field: err.path.join("."),
+          message: err.message,
+        })),
+      },
+    }),
+    { status: 400 }
+  );
 }
 ```
 
 ### Not Found Errors (404):
+
 **Scenario**: Aquarium type doesn't exist
+
 ```typescript
 const { data: aquariumType, error: typeError } = await supabase
-  .from('aquarium_types')
-  .select('id')
-  .eq('id', aquarium_type_id)
+  .from("aquarium_types")
+  .select("id")
+  .eq("id", aquarium_type_id)
   .single();
 
 if (typeError || !aquariumType) {
-  return new Response(JSON.stringify({
-    error: {
-      code: 'NOT_FOUND',
-      message: 'Aquarium type not found'
-    }
-  }), { status: 404 });
+  return new Response(
+    JSON.stringify({
+      error: {
+        code: "NOT_FOUND",
+        message: "Aquarium type not found",
+      },
+    }),
+    { status: 404 }
+  );
 }
 ```
 
 ### Conflict Errors (409):
+
 **Scenario**: Duplicate aquarium name for user
+
 ```typescript
 // Supabase error code for unique constraint violation
-if (error?.code === '23505') {
-  return new Response(JSON.stringify({
-    error: {
-      code: 'CONFLICT',
-      message: 'An aquarium with this name already exists'
-    }
-  }), { status: 409 });
+if (error?.code === "23505") {
+  return new Response(
+    JSON.stringify({
+      error: {
+        code: "CONFLICT",
+        message: "An aquarium with this name already exists",
+      },
+    }),
+    { status: 409 }
+  );
 }
 ```
 
 ### Server Errors (500):
+
 **Scenario**: Unexpected database or server errors
+
 ```typescript
 catch (error) {
   console.error('Error creating aquarium:', error);
@@ -327,6 +369,7 @@ catch (error) {
 ```
 
 ### Error Logging:
+
 - Log all errors to console with context
 - Include user_id (sanitized) and request details
 - For production: integrate with error tracking service (e.g., Sentry)
@@ -334,12 +377,14 @@ catch (error) {
 ## 8. Performance Considerations
 
 ### Database Queries:
+
 - **Aquarium Type Validation**: Single SELECT query with indexed lookup (primary key)
 - **Aquarium Insertion**: Single INSERT query
 - **Total Queries**: 2 database round trips
 
 ### Optimization Strategies:
-1. **Index Usage**: 
+
+1. **Index Usage**:
    - Primary key index on `aquarium_types.id` (automatic)
    - Composite unique index on `aquariums(user_id, name)` (from schema)
    - Index on `aquariums.user_id` for RLS policy evaluation
@@ -356,6 +401,7 @@ catch (error) {
    - Not critical for MVP but consider for scale
 
 ### Expected Performance:
+
 - **Response Time**: < 200ms under normal load
 - **Bottlenecks**: None expected for MVP scale
 - **Scalability**: RLS policies add minimal overhead; Supabase handles scaling
@@ -363,61 +409,60 @@ catch (error) {
 ## 9. Implementation Steps
 
 ### Step 1: Create Zod Validation Schema
+
 **File**: `src/pages/api/aquariums/index.ts`
 
 ```typescript
-import { z } from 'zod';
+import { z } from "zod";
 
 const createAquariumSchema = z.object({
-  name: z.string().min(1, 'Name is required and must not be empty'),
-  aquarium_type_id: z.string().uuid('Invalid aquarium type ID format'),
+  name: z.string().min(1, "Name is required and must not be empty"),
+  aquarium_type_id: z.string().uuid("Invalid aquarium type ID format"),
   description: z.string().optional(),
-  volume: z.number().positive('Volume must be a positive number').optional()
+  volume: z.number().positive("Volume must be a positive number").optional(),
 });
 ```
 
 ### Step 2: Create Aquarium Service
+
 **File**: `src/lib/services/aquarium.service.ts`
 
 ```typescript
-import type { SupabaseClient } from '@/db/supabase.client';
-import type { CreateAquariumCommand, AquariumEntity } from '@/types';
+import type { SupabaseClient } from "@/db/supabase.client";
+import type { CreateAquariumCommand, AquariumEntity } from "@/types";
 
 export class AquariumService {
   constructor(private supabase: SupabaseClient) {}
 
-  async createAquarium(
-    userId: string,
-    command: CreateAquariumCommand
-  ): Promise<AquariumEntity> {
+  async createAquarium(userId: string, command: CreateAquariumCommand): Promise<AquariumEntity> {
     // Validate aquarium type exists
     const { data: aquariumType, error: typeError } = await this.supabase
-      .from('aquarium_types')
-      .select('id')
-      .eq('id', command.aquarium_type_id)
+      .from("aquarium_types")
+      .select("id")
+      .eq("id", command.aquarium_type_id)
       .single();
 
     if (typeError || !aquariumType) {
-      throw new Error('AQUARIUM_TYPE_NOT_FOUND');
+      throw new Error("AQUARIUM_TYPE_NOT_FOUND");
     }
 
     // Insert aquarium
     const { data: aquarium, error: insertError } = await this.supabase
-      .from('aquariums')
+      .from("aquariums")
       .insert({
         user_id: userId,
         name: command.name,
         aquarium_type_id: command.aquarium_type_id,
         description: command.description,
-        volume: command.volume
+        volume: command.volume,
       })
       .select()
       .single();
 
     if (insertError) {
       // Handle unique constraint violation
-      if (insertError.code === '23505') {
-        throw new Error('DUPLICATE_AQUARIUM_NAME');
+      if (insertError.code === "23505") {
+        throw new Error("DUPLICATE_AQUARIUM_NAME");
       }
       throw insertError;
     }
@@ -428,38 +473,45 @@ export class AquariumService {
 ```
 
 ### Step 3: Create API Endpoint
+
 **File**: `src/pages/api/aquariums/index.ts`
 
 ```typescript
-import type { APIRoute } from 'astro';
-import { z } from 'zod';
-import { AquariumService } from '@/lib/services/aquarium.service';
-import type { CreateAquariumCommand, CreateAquariumResponseDTO, ErrorResponseDTO } from '@/types';
+import type { APIRoute } from "astro";
+import { z } from "zod";
+import { AquariumService } from "@/lib/services/aquarium.service";
+import type { CreateAquariumCommand, CreateAquariumResponseDTO, ErrorResponseDTO } from "@/types";
 
 export const prerender = false;
 
 const createAquariumSchema = z.object({
-  name: z.string().min(1, 'Name is required and must not be empty'),
-  aquarium_type_id: z.string().uuid('Invalid aquarium type ID format'),
+  name: z.string().min(1, "Name is required and must not be empty"),
+  aquarium_type_id: z.string().uuid("Invalid aquarium type ID format"),
   description: z.string().optional(),
-  volume: z.number().positive('Volume must be a positive number').optional()
+  volume: z.number().positive("Volume must be a positive number").optional(),
 });
 
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
     // Step 1: Authenticate user
-    const { data: { user }, error: authError } = await locals.supabase.auth.getUser();
-    
+    const {
+      data: { user },
+      error: authError,
+    } = await locals.supabase.auth.getUser();
+
     if (authError || !user) {
-      return new Response(JSON.stringify({
-        error: {
-          code: 'UNAUTHORIZED',
-          message: 'Authentication required'
+      return new Response(
+        JSON.stringify({
+          error: {
+            code: "UNAUTHORIZED",
+            message: "Authentication required",
+          },
+        } as ErrorResponseDTO),
+        {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
         }
-      } as ErrorResponseDTO), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      );
     }
 
     // Step 2: Parse and validate request body
@@ -467,19 +519,22 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const validation = createAquariumSchema.safeParse(body);
 
     if (!validation.success) {
-      return new Response(JSON.stringify({
-        error: {
-          code: 'VALIDATION_ERROR',
-          message: 'Invalid input data',
-          details: validation.error.errors.map(err => ({
-            field: err.path.join('.'),
-            message: err.message
-          }))
+      return new Response(
+        JSON.stringify({
+          error: {
+            code: "VALIDATION_ERROR",
+            message: "Invalid input data",
+            details: validation.error.errors.map((err) => ({
+              field: err.path.join("."),
+              message: err.message,
+            })),
+          },
+        } as ErrorResponseDTO),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
         }
-      } as ErrorResponseDTO), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      );
     }
 
     const command: CreateAquariumCommand = validation.data;
@@ -489,63 +544,76 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const aquarium = await aquariumService.createAquarium(user.id, command);
 
     // Step 4: Return success response
-    return new Response(JSON.stringify({
-      data: aquarium
-    } as CreateAquariumResponseDTO), {
-      status: 201,
-      headers: { 'Content-Type': 'application/json' }
-    });
-
+    return new Response(
+      JSON.stringify({
+        data: aquarium,
+      } as CreateAquariumResponseDTO),
+      {
+        status: 201,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   } catch (error) {
     // Handle service-level errors
     if (error instanceof Error) {
-      if (error.message === 'AQUARIUM_TYPE_NOT_FOUND') {
-        return new Response(JSON.stringify({
-          error: {
-            code: 'NOT_FOUND',
-            message: 'Aquarium type not found'
+      if (error.message === "AQUARIUM_TYPE_NOT_FOUND") {
+        return new Response(
+          JSON.stringify({
+            error: {
+              code: "NOT_FOUND",
+              message: "Aquarium type not found",
+            },
+          } as ErrorResponseDTO),
+          {
+            status: 404,
+            headers: { "Content-Type": "application/json" },
           }
-        } as ErrorResponseDTO), {
-          status: 404,
-          headers: { 'Content-Type': 'application/json' }
-        });
+        );
       }
 
-      if (error.message === 'DUPLICATE_AQUARIUM_NAME') {
-        return new Response(JSON.stringify({
-          error: {
-            code: 'CONFLICT',
-            message: 'An aquarium with this name already exists'
+      if (error.message === "DUPLICATE_AQUARIUM_NAME") {
+        return new Response(
+          JSON.stringify({
+            error: {
+              code: "CONFLICT",
+              message: "An aquarium with this name already exists",
+            },
+          } as ErrorResponseDTO),
+          {
+            status: 409,
+            headers: { "Content-Type": "application/json" },
           }
-        } as ErrorResponseDTO), {
-          status: 409,
-          headers: { 'Content-Type': 'application/json' }
-        });
+        );
       }
     }
 
     // Log unexpected errors
-    console.error('Error creating aquarium:', error);
+    console.error("Error creating aquarium:", error);
 
-    return new Response(JSON.stringify({
-      error: {
-        code: 'INTERNAL_SERVER_ERROR',
-        message: 'An unexpected error occurred'
+    return new Response(
+      JSON.stringify({
+        error: {
+          code: "INTERNAL_SERVER_ERROR",
+          message: "An unexpected error occurred",
+        },
+      } as ErrorResponseDTO),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
       }
-    } as ErrorResponseDTO), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    );
   }
 };
 ```
 
 ### Step 4: Test Authentication
+
 - Test with valid authenticated user
 - Test with unauthenticated request (401)
 - Test with expired token (401)
 
 ### Step 5: Test Input Validation
+
 - Test with missing required fields (400)
 - Test with invalid UUID format (400)
 - Test with negative volume (400)
@@ -553,29 +621,34 @@ export const POST: APIRoute = async ({ request, locals }) => {
 - Test with all valid inputs (201)
 
 ### Step 6: Test Business Logic
+
 - Test creating aquarium with valid type (201)
 - Test creating aquarium with non-existent type (404)
 - Test creating duplicate aquarium name for same user (409)
 - Test creating aquarium with same name for different user (201 - should succeed)
 
 ### Step 7: Test Response Format
+
 - Verify 201 status code on success
 - Verify response includes all expected fields
 - Verify timestamps are in correct format
 - Verify error responses match specified format
 
 ### Step 8: Integration Testing
+
 - Test end-to-end flow from request to database
 - Verify RLS policies enforce user isolation
 - Verify unique constraints work correctly
 - Test with concurrent requests
 
 ### Step 9: Performance Testing
+
 - Measure response time under normal load
 - Verify database query count (should be 2)
 - Check for N+1 query problems (none expected)
 
 ### Step 10: Documentation
+
 - Document endpoint in API documentation
 - Add JSDoc comments to service methods
 - Update README with example usage
@@ -584,6 +657,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 ## 10. Testing Checklist
 
 ### Unit Tests:
+
 - [ ] Validation schema correctly validates valid input
 - [ ] Validation schema rejects invalid input (missing fields, wrong types)
 - [ ] Service creates aquarium with valid data
@@ -591,6 +665,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 - [ ] Service throws error for duplicate name
 
 ### Integration Tests:
+
 - [ ] POST /api/aquariums returns 401 without authentication
 - [ ] POST /api/aquariums returns 400 for invalid data
 - [ ] POST /api/aquariums returns 404 for invalid aquarium type
@@ -600,6 +675,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 - [ ] RLS prevents creating aquarium for different user
 
 ### Edge Cases:
+
 - [ ] Name with special characters
 - [ ] Very long name (within TEXT limits)
 - [ ] Volume at boundary values (0.01, very large)
@@ -609,22 +685,26 @@ export const POST: APIRoute = async ({ request, locals }) => {
 ## 11. Dependencies
 
 ### Required Packages:
+
 - `zod` - Input validation (already in project)
 - `@supabase/supabase-js` - Database client (already in project)
 
 ### Database Requirements:
+
 - `aquariums` table with RLS policies enabled
 - `aquarium_types` table pre-populated
 - Unique constraint on `(user_id, name)`
 - Foreign key constraint on `aquarium_type_id`
 
 ### Environment Variables:
+
 - `SUPABASE_URL` - Supabase project URL
 - `SUPABASE_ANON_KEY` - Supabase anonymous key
 
 ## 12. Future Enhancements
 
 ### Potential Improvements:
+
 1. **Batch Creation**: Support creating multiple aquariums in one request
 2. **Image Upload**: Allow users to upload aquarium photos
 3. **Templates**: Pre-fill description/volume based on aquarium type
@@ -634,8 +714,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
 7. **Rate Limiting**: Prevent abuse with per-user rate limits
 
 ### Monitoring:
+
 - Track creation success/failure rates
 - Monitor average response times
 - Alert on increased 409 errors (may indicate UX issues)
 - Track most popular aquarium types
-

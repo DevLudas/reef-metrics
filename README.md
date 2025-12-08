@@ -22,6 +22,7 @@ A web application for marine aquarium hobbyists to monitor water parameters, ana
 ReefMetrics is a Minimum Viable Product (MVP) designed to help marine aquarists centralize the monitoring of water parameters. The current process of tracking water chemistry is often fragmented, relying on notebooks or spreadsheets, which makes it difficult to track trends and detect problems.
 
 This application provides a dedicated platform to:
+
 - Manually enter test results for seven key water parameters.
 - Compare results against predefined or personalized optimal values.
 - Receive AI-generated recommendations when abnormalities are detected.
@@ -32,6 +33,7 @@ The goal is to simplify aquarium management by providing a centralized tool for 
 ## Tech Stack
 
 ### Frontend
+
 - **Framework**: [Astro 5](https://astro.build/)
 - **UI Library**: [React 19](https://react.dev/) for interactive components
 - **Language**: [TypeScript 5](https://www.typescriptlang.org/)
@@ -39,15 +41,18 @@ The goal is to simplify aquarium management by providing a centralized tool for 
 - **Components**: [Shadcn/ui](https://ui.shadcn.com/)
 
 ### Backend
+
 - **Service**: [Supabase](https://supabase.com/)
   - **Database**: PostgreSQL
   - **Authentication**: Built-in user management
   - **APIs**: Backend-as-a-Service
 
 ### AI
+
 - **Service**: [Openrouter.ai](https://openrouter.ai/) for access to various large language models.
 
 ### DevOps
+
 - **CI/CD**: GitHub Actions
 - **Hosting**: DigitalOcean (via Docker)
 
@@ -56,6 +61,7 @@ The goal is to simplify aquarium management by providing a centralized tool for 
 To set up and run this project locally, follow these steps:
 
 1.  **Clone the repository:**
+
     ```sh
     git clone https://github.com/jaceksobieraj/reef-metrics.git
     cd reef-metrics
@@ -63,17 +69,20 @@ To set up and run this project locally, follow these steps:
 
 2.  **Set up Node.js:**
     Ensure you are using the correct Node.js version as specified in the `.nvmrc` file. If you use `nvm`, you can run:
+
     ```sh
     nvm use
     ```
 
 3.  **Install dependencies:**
+
     ```sh
     npm install
     ```
 
 4.  **Set up environment variables:**
     Create a `.env` file in the root of the project and add the necessary environment variables for Supabase.
+
     ```env
     PUBLIC_SUPABASE_URL="your-supabase-url"
     PUBLIC_SUPABASE_ANON_KEY="your-supabase-anon-key"
@@ -104,19 +113,24 @@ The following scripts are available in `package.json`:
 The ReefMetrics project follows a comprehensive multi-layered testing approach to ensure functionality, reliability, and quality:
 
 ### Unit Testing
+
 Unit tests verify individual functions and modules in isolation using **Vitest**. Tests focus on:
+
 - Utility functions (e.g., `parameter-status.ts`)
 - Zod validation schemas
 - Individual service methods with mocked dependencies
 - Type safety with TypeScript
 
 ### Integration Testing
+
 Integration tests validate the interaction between different parts of the application, including:
+
 - Service layer integration with the Supabase database
 - API endpoints' interaction with their respective services
 - Data flow between components and services
 
 ### Test Tools
+
 - **Vitest**: Modern, fast unit and integration testing framework for Vite-based projects
 - **Playwright**: E2E and API testing for comprehensive user flow validation
 
@@ -153,11 +167,13 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 The ReefMetrics API provides REST endpoints for managing aquariums and their measurements. All endpoints require authentication via Supabase JWT tokens.
 
 ### Authentication
+
 All API requests must include a valid JWT token obtained from Supabase authentication. The token is automatically handled by the frontend client.
 
 ### Endpoints
 
 #### Aquariums
+
 - `GET /api/aquariums` - List user's aquariums
 - `POST /api/aquariums` - Create new aquarium
 - `GET /api/aquariums/:id` - Get aquarium details
@@ -165,6 +181,7 @@ All API requests must include a valid JWT token obtained from Supabase authentic
 - `DELETE /api/aquariums/:id` - Delete aquarium
 
 #### Measurements
+
 - `GET /api/measurements/:aquariumId` - List measurements with filtering and pagination
   - Query params: `start_date`, `end_date`, `parameter_id`, `limit`, `offset`, `sort`, `order`
 - `GET /api/measurements/:aquariumId/latest` - Get latest measurement per parameter
@@ -178,6 +195,7 @@ All API requests must include a valid JWT token obtained from Supabase authentic
 - `DELETE /api/measurements/:id` - Delete measurement
 
 #### Reference Data
+
 - `GET /api/aquarium-types` - List all aquarium types
 - `GET /api/aquarium-types/:id` - Get single aquarium type
 - `GET /api/parameters` - List all parameters
@@ -187,7 +205,9 @@ All API requests must include a valid JWT token obtained from Supabase authentic
 - `GET /api/aquarium-types/:aquariumTypeId/optimal-values` - Get optimal values for specific aquarium type
 
 ### Response Format
+
 All responses follow a consistent structure:
+
 ```json
 {
   "data": { ... } // Single item or array
@@ -195,6 +215,7 @@ All responses follow a consistent structure:
 ```
 
 Paginated responses include:
+
 ```json
 {
   "data": [...],
@@ -207,6 +228,7 @@ Paginated responses include:
 ```
 
 ### Error Responses
+
 ```json
 {
   "error": {

@@ -25,11 +25,7 @@ export function AquariumGrid({ aquariums }: AquariumGridProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {aquariums.map((aquarium) => (
-          <AquariumCard
-            key={aquarium.id}
-            aquarium={aquarium}
-            onAquariumDeleted={handleAquariumChange}
-          />
+          <AquariumCard key={aquarium.id} aquarium={aquarium} onAquariumDeleted={handleAquariumChange} />
         ))}
       </div>
     </div>

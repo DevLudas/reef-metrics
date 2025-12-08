@@ -33,7 +33,7 @@ export const GET: APIRoute = async ({ locals }) => {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
-  } catch (error: unknown) {
+  } catch {
     return new Response(
       JSON.stringify({
         error: { code: "INTERNAL_ERROR", message: "An unexpected error occurred" },

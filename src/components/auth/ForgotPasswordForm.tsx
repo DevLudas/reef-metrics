@@ -62,7 +62,7 @@ export function ForgotPasswordForm({ onSubmit }: ForgotPasswordFormProps) {
           <div>
             <h3 className="font-medium text-green-800">Check your email</h3>
             <p className="mt-1 text-sm text-green-700">
-              We've sent a password reset link to your email address. Click the link to create a new password.
+              We&rsquo;ve sent a password reset link to your email address. Click the link to create a new password.
             </p>
             <a
               href="/login"
@@ -114,7 +114,7 @@ export function ForgotPasswordForm({ onSubmit }: ForgotPasswordFormProps) {
 
       {/* Help text */}
       <p className="text-sm text-muted-foreground">
-        Enter the email address associated with your account and we'll send you a link to reset your password.
+        Enter the email address associated with your account and we&rsquo;ll send you a link to reset your password.
       </p>
 
       {/* Submit Button */}
@@ -146,4 +146,3 @@ export function ForgotPasswordForm({ onSubmit }: ForgotPasswordFormProps) {
     </form>
   );
 }
-

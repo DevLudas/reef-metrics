@@ -1,7 +1,6 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import { DashboardContent } from "@/components/dashboard/DashboardContent";
-import { DashboardSkeleton } from "@/components/dashboard/DashboardSkeleton";
 import DashboardService from "@/lib/services/dashboard.service";
 // For now, we'll use a mock user ID until authentication is implemented
 // TODO: Replace with actual user ID from session
@@ -21,7 +20,6 @@ try {
   dashboardData = await dashboardService.getDashboardData(DEFAULT_USER_ID, preferredAquariumId);
 } catch (err) {
   error = err instanceof Error ? err.message : "Failed to load dashboard";
-  console.error("Error loading dashboard:", err);
 }
 ---
 

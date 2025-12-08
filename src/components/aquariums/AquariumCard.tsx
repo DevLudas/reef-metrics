@@ -39,8 +39,7 @@ export function AquariumCard({ aquarium, onAquariumDeleted }: AquariumCardProps)
       });
 
       onAquariumDeleted(aquarium.id);
-    } catch (error) {
-      console.error("Error deleting aquarium:", error);
+    } catch {
       toast({
         title: "Error",
         description: "Failed to delete aquarium. Please try again.",
@@ -205,11 +204,7 @@ export function AquariumCard({ aquarium, onAquariumDeleted }: AquariumCardProps)
         </div>
       </div>
 
-      <AquariumFormModal
-        isOpen={isEditModalOpen}
-        setIsOpen={setIsEditModalOpen}
-        aquariumToEdit={aquariumForEdit}
-      />
+      <AquariumFormModal isOpen={isEditModalOpen} setIsOpen={setIsEditModalOpen} aquariumToEdit={aquariumForEdit} />
 
       <DeleteConfirmationDialog
         isOpen={isDeleteDialogOpen}

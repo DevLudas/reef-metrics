@@ -1,13 +1,16 @@
 # View Implementation Plan: Aquariums Management
 
 ## 1. Overview
+
 This document outlines the implementation plan for the Aquariums Management View. This view serves as a central hub for users to manage their aquariums, allowing them to view a list of all their tanks, and perform Create, Update, and Delete operations. The view will be accessible via the main application navigation and will handle cases such as users having no aquariums, redirecting them to an onboarding page.
 
 ## 2. View Routing
+
 - **Path**: `/aquariums`
 - **File**: `src/pages/aquariums.astro`
 
 ## 3. Component Structure
+
 The view will be composed of the following component hierarchy:
 
 ```
@@ -28,6 +31,7 @@ Layout.astro
 ## 4. Component Details
 
 ### `aquariums.astro`
+
 - **Component description**: The main Astro page for the view. It fetches the list of aquariums for the current user on the server and passes them to the `AquariumGrid` client component. It also handles the redirect to `/onboarding` if the user has no aquariums.
 - **Main elements**: `<Layout>`, `<AquariumGrid>`
 - **Handled interactions**: None (server-side logic only).
@@ -36,6 +40,7 @@ Layout.astro
 - **Props**: None.
 
 ### `AquariumGrid.tsx`
+
 - **Component description**: A client-side component that displays the grid of aquariums. It manages the state of the aquarium list and orchestrates interactions for adding, editing, and deleting aquariums.
 - **Main elements**: `div` (grid container), `AquariumCard`, `AddAquariumButton`.
 - **Handled interactions**:
@@ -47,6 +52,7 @@ Layout.astro
 - **Props**: `initialAquariums: Aquarium[]`
 
 ### `AquariumCard.tsx`
+
 - **Component description**: Displays a single aquarium's information (name, type, volume) and provides actions (Edit, Delete, View Details) via a dropdown menu.
 - **Main elements**: `<Card>`, `<a>` (for details link), `<DropdownMenu>`, `<DeleteConfirmationDialog>`, `<AquariumFormModal>`.
 - **Handled interactions**:
@@ -58,6 +64,7 @@ Layout.astro
 - **Props**: `aquarium: Aquarium`, `onAquariumUpdated: (aquarium: Aquarium) => void`, `onAquariumDeleted: (id: string) => void`.
 
 ### `AddAquariumButton.tsx`
+
 - **Component description**: A button that, when clicked, opens the `AquariumFormModal` to allow the user to add a new aquarium.
 - **Main elements**: `<Button>`, `<AquariumFormModal>`.
 - **Handled interactions**:
@@ -68,6 +75,7 @@ Layout.astro
 - **Props**: `onAquariumAdded: (aquarium: Aquarium) => void`.
 
 ### `AquariumFormModal.tsx`
+
 - **Component description**: A modal dialog containing the `AquariumForm`. It is used for both creating and editing an aquarium. It handles the form submission state (loading, error) and communicates with the API.
 - **Main elements**: `<Dialog>`, `<AquariumForm>`.
 - **Handled interactions**:
@@ -77,6 +85,7 @@ Layout.astro
 - **Props**: `aquariumToEdit?: Aquarium`, `onAquariumAdded: (aquarium: Aquarium) => void`, `onAquariumUpdated: (aquarium: Aquarium) => void`, `isOpen: boolean`, `setIsOpen: (isOpen: boolean) => void`.
 
 ### `AquariumForm.tsx`
+
 - **Component description**: The actual form with input fields for aquarium data (name, type, volume, description). It uses `zod` for validation and `react-hook-form`.
 - **Main elements**: `<form>`, `<Input>`, `<Select>`, `<Textarea>`.
 - **Handled interactions**:
@@ -90,6 +99,7 @@ Layout.astro
 - **Props**: `onSubmit: (data: AquariumDTO) => void`, `initialData?: AquariumDTO`, `aquariumTypes: AquariumType[]`.
 
 ### `DeleteConfirmationDialog.tsx`
+
 - **Component description**: A modal dialog that asks the user for confirmation before deleting an aquarium.
 - **Main elements**: `<Dialog>`.
 - **Handled interactions**:
@@ -101,7 +111,9 @@ Layout.astro
 ## 5. Types
 
 ### `Aquarium` (from `src/types.ts`)
+
 The core entity type representing an aquarium, fetched from the API.
+
 ```typescript
 export type Aquarium = {
   id: string;
@@ -116,7 +128,9 @@ export type Aquarium = {
 ```
 
 ### `AquariumDTO` (from `src/types.ts`)
+
 The Data Transfer Object used for the request body when creating or updating an aquarium.
+
 ```typescript
 export type AquariumDTO = {
   name: string;
@@ -127,7 +141,9 @@ export type AquariumDTO = {
 ```
 
 ### `AquariumType` (from `src/types.ts`)
+
 Represents the type of an aquarium (e.g., "Mixed Reef"), used to populate the form's select input.
+
 ```typescript
 export type AquariumType = {
   id: string;
@@ -139,6 +155,7 @@ export type AquariumType = {
 ```
 
 ## 6. State Management
+
 State will be managed locally within the React components using `useState` hooks. No global state or complex state management libraries are required.
 
 - **`AquariumGrid.tsx`**: Will use a state variable `const [aquariums, setAquariums] = useState<Aquarium[]>(initialAquariums);` to manage the list of aquariums displayed. This state will be updated via handler functions (`handleAquariumAdded`, `handleAquariumUpdated`, `handleAquariumDeleted`) that are passed down as props.
@@ -170,6 +187,7 @@ State will be managed locally within the React components using `useState` hooks
   - **Response Type**: `204 No Content`
 
 ## 8. User Interactions
+
 - **Viewing Aquariums**: The user navigates to `/aquariums` and sees a grid of their aquariums. If they have no aquariums, they are redirected to `/onboarding`.
 - **Adding an Aquarium**:
   1. User clicks the "Add Aquarium" button.
@@ -189,6 +207,7 @@ State will be managed locally within the React components using `useState` hooks
   4. A `DELETE` request is sent. On success, the dialog closes and the card is removed from the grid.
 
 ## 9. Conditions and Validation
+
 - **No Aquariums**: The `aquariums.astro` page will check if the user has any aquariums. If the list is empty, it will perform a server-side redirect to the `/onboarding` page.
 - **Form Validation**: The `AquariumForm` will perform client-side validation using `zod` and `react-hook-form` before submission is enabled.
   - `name`: Must be a string between 3 and 50 characters.
@@ -198,11 +217,13 @@ State will be managed locally within the React components using `useState` hooks
 - **API Authorization**: All API endpoints are protected and require an authenticated user session. This is handled by the Astro middleware.
 
 ## 10. Error Handling
+
 - **API Request Failures**: All client-side `fetch` calls will be wrapped in `try...catch` blocks. In case of an error (e.g., 4xx, 5xx status codes), a toast notification will be displayed with a user-friendly message (e.g., "Failed to add aquarium. Please try again."). The error will be logged to the console for debugging.
 - **Validation Errors**: `react-hook-form` will display validation error messages inline, next to the corresponding form fields. The form's submit button will be disabled until the form is valid.
 - **Deletion Confirmation**: To prevent accidental data loss, a confirmation dialog is required before executing a delete operation.
 
 ## 11. Implementation Steps
+
 1.  **Create Page File**: Create the Astro page at `src/pages/aquariums.astro`.
 2.  **Server-Side Logic**: In `aquariums.astro`, implement the server-side script to fetch the user's aquariums using `Astro.locals.supabase`. Add the logic to redirect to `/onboarding` if the aquarium list is empty.
 3.  **Create `AquariumGrid.tsx`**: Develop the main grid component in `src/components/dashboard/`. It should accept `initialAquariums` as a prop and manage the aquarium list in its state using `useState`.
@@ -214,4 +235,3 @@ State will be managed locally within the React components using `useState` hooks
 9.  **Integrate Components**: In `aquariums.astro`, render the `<AquariumGrid />` component, passing the fetched aquariums as the `initialAquariums` prop. Wire up the components with the necessary props and event handlers.
 10. **Styling**: Apply Tailwind CSS classes to all new components to ensure they are responsive and match the application's design system.
 11. **Testing**: Manually test all user stories: adding, editing, and deleting aquariums. Verify the redirect for new users. Check for responsiveness and accessibility compliance.
-

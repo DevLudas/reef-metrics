@@ -48,8 +48,7 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
 
     try {
       if (onSubmit) {
-        const { confirmPassword, ...submitData } = data;
-        await onSubmit(submitData);
+        await onSubmit(data as Omit<typeof data, "confirmPassword">);
       }
     } catch (error) {
       setServerError(error instanceof Error ? error.message : "An error occurred during registration");
@@ -204,4 +203,3 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
     </form>
   );
 }
-

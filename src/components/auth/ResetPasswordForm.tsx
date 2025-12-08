@@ -73,7 +73,10 @@ export function ResetPasswordForm({ token, onSubmit }: ResetPasswordFormProps) {
           <div>
             <h3 className="font-medium text-green-800">Password reset successful</h3>
             <p className="mt-1 text-sm text-green-700">Your password has been reset successfully.</p>
-            <a href="/login" className="mt-3 inline-block text-sm font-medium text-green-800 underline hover:text-green-900">
+            <a
+              href="/login"
+              className="mt-3 inline-block text-sm font-medium text-green-800 underline hover:text-green-900"
+            >
               Go to login
             </a>
           </div>
@@ -173,4 +176,3 @@ export function ResetPasswordForm({ token, onSubmit }: ResetPasswordFormProps) {
     </form>
   );
 }
-

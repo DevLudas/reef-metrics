@@ -192,6 +192,7 @@ flowchart TD
 ## Component Descriptions
 
 ### Pages
+
 - **index.astro**: Home page - entry point, contains login and registration links
 - **login.astro**: Login form (Email + Password)
 - **register.astro**: Registration form (Email + Password + Confirmation)
@@ -202,10 +203,12 @@ flowchart TD
 - **aquariums.astro**: Aquariums management (protected)
 
 ### Layouts
+
 - **AuthLayout.astro**: Dedicated layout for authentication pages - centered form with logo
 - **Layout.astro**: Main application layout - header, navigation, content
 
 ### React Components (Interactive)
+
 - **LoginForm.tsx**: Manages login state, validation, form submission
 - **RegisterForm.tsx**: Manages registration state and validation
 - **ForgotPasswordForm.tsx**: Email input for password reset request
@@ -213,13 +216,16 @@ flowchart TD
 - **UserMenu.tsx**: User dropdown menu with logout option
 
 ### Astro Components (Static)
+
 - **AppHeader.astro**: Header with logo and user menu
 
 ### UI Components (Shadcn)
+
 - Standardized components for building the interface
 - Input, Button, Label, Avatar, DropdownMenu, Dialog
 
 ### API Endpoints
+
 - **POST /api/auth/register**: New user registration
 - **POST /api/auth/login**: User login
 - **POST /api/auth/logout**: User logout
@@ -227,10 +233,12 @@ flowchart TD
 - **POST /api/auth/reset-password**: Password reset completion
 
 ### Services
+
 - **AuthService**: Authentication handling, get current user, logout
 - **Zod Validation**: Validation schemas for each form
 
 ### Infrastructure
+
 - **Middleware**: Session management, session cookie verification, attach user data
 - **Supabase Client**: Interaction with backend (database, authentication)
 - **Supabase Auth**: Remote authentication backend
@@ -238,6 +246,7 @@ flowchart TD
 ## Main Flows
 
 ### Registration Flow
+
 1. User on home page → clicks "Sign up"
 2. Goes to `/register`
 3. RegisterForm validates data → sends to `/api/auth/register`
@@ -245,18 +254,21 @@ flowchart TD
 5. User automatically logged in → redirect to `/dashboard`
 
 ### Login Flow
+
 1. User goes to `/login`
 2. LoginForm validates data → sends to `/api/auth/login`
 3. API authenticates with Supabase → returns user data
 4. User session created → redirect to `/dashboard`
 
 ### Logout Flow
+
 1. User clicks logout in UserMenu
 2. Request sent to `/api/auth/logout`
 3. API calls Supabase signOut → clears session
 4. User redirected to home page
 
 ### Password Reset Flow
+
 1. User on `/login` → clicks "Forgot password?"
 2. Goes to `/forgot-password`
 3. ForgotPasswordForm sends email to `/api/auth/forgot-password`
@@ -271,4 +283,3 @@ flowchart TD
 - **Protected pages** (dashboard, profile, aquariums) require authentication
 - Unauthenticated users are redirected to `/login`
 - Authenticated users are redirected from `/login` and `/register` to `/dashboard`
-

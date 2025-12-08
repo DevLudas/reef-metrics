@@ -42,6 +42,7 @@ These endpoints form the core CRUD operations for aquarium management and enforc
   - Required URL parameter:
     - `id`: UUID of the aquarium
 - **Request Body** (all fields optional):
+
 ```json
 {
   "name": "string (min 1 char)",
@@ -50,6 +51,7 @@ These endpoints form the core CRUD operations for aquarium management and enforc
   "volume": "number (positive)"
 }
 ```
+
 - **Authentication**: Required (user must be authenticated and own the aquarium)
 
 ### 2.4 Delete Aquarium
@@ -68,20 +70,20 @@ These endpoints form the core CRUD operations for aquarium management and enforc
 
 ```typescript
 // List endpoint
-AquariumListItemDTO
-AquariumsListResponseDTO
+AquariumListItemDTO;
+AquariumsListResponseDTO;
 
 // Single item endpoint
-AquariumDTO
-AquariumResponseDTO
+AquariumDTO;
+AquariumResponseDTO;
 
 // Update endpoint
-UpdateAquariumCommand
-UpdateAquariumResponseDTO
+UpdateAquariumCommand;
+UpdateAquariumResponseDTO;
 
 // Error responses (all endpoints)
-ErrorResponseDTO
-ValidationErrorDetail
+ErrorResponseDTO;
+ValidationErrorDetail;
 ```
 
 ### Validation Schemas (to be created with Zod)
@@ -89,22 +91,24 @@ ValidationErrorDetail
 ```typescript
 // Query parameters validation for GET /api/aquariums
 listAquariumsQuerySchema = z.object({
-  sort: z.enum(['name', 'created_at']).optional().default('created_at'),
-  order: z.enum(['asc', 'desc']).optional().default('desc')
-})
+  sort: z.enum(["name", "created_at"]).optional().default("created_at"),
+  order: z.enum(["asc", "desc"]).optional().default("desc"),
+});
 
 // URL parameter validation (all endpoints with :id)
-uuidParamSchema = z.string().uuid()
+uuidParamSchema = z.string().uuid();
 
 // Update command validation for PATCH /api/aquariums/:id
-updateAquariumSchema = z.object({
-  name: z.string().min(1).optional(),
-  aquarium_type_id: z.string().uuid().optional(),
-  description: z.string().optional(),
-  volume: z.number().positive().optional()
-}).refine(data => Object.keys(data).length > 0, {
-  message: "At least one field must be provided for update"
-})
+updateAquariumSchema = z
+  .object({
+    name: z.string().min(1).optional(),
+    aquarium_type_id: z.string().uuid().optional(),
+    description: z.string().optional(),
+    volume: z.number().positive().optional(),
+  })
+  .refine((data) => Object.keys(data).length > 0, {
+    message: "At least one field must be provided for update",
+  });
 ```
 
 ## 4. Response Details
@@ -112,6 +116,7 @@ updateAquariumSchema = z.object({
 ### 4.1 List User's Aquariums
 
 **Success Response (200 OK)**:
+
 ```json
 {
   "data": [
@@ -134,12 +139,14 @@ updateAquariumSchema = z.object({
 ```
 
 **Error Responses**:
+
 - `401 Unauthorized`: User not authenticated
 - `400 Bad Request`: Invalid query parameters (invalid sort field or order)
 
 ### 4.2 Get Single Aquarium
 
 **Success Response (200 OK)**:
+
 ```json
 {
   "data": {
@@ -161,6 +168,7 @@ updateAquariumSchema = z.object({
 ```
 
 **Error Responses**:
+
 - `401 Unauthorized`: User not authenticated
 - `403 Forbidden`: Aquarium belongs to another user
 - `404 Not Found`: Aquarium not found
@@ -169,6 +177,7 @@ updateAquariumSchema = z.object({
 ### 4.3 Update Aquarium
 
 **Success Response (200 OK)**:
+
 ```json
 {
   "data": {
@@ -185,6 +194,7 @@ updateAquariumSchema = z.object({
 ```
 
 **Error Responses**:
+
 - `401 Unauthorized`: User not authenticated
 - `403 Forbidden`: Aquarium belongs to another user
 - `404 Not Found`: Aquarium not found
@@ -196,6 +206,7 @@ updateAquariumSchema = z.object({
 **Success Response (204 No Content)**: Empty response body
 
 **Error Responses**:
+
 - `401 Unauthorized`: User not authenticated
 - `403 Forbidden`: Aquarium belongs to another user
 - `404 Not Found`: Aquarium not found
@@ -427,6 +438,7 @@ async deleteAquarium(
 ```
 
 **Implementation details**:
+
 - Use `.select('*, aquarium_type:aquarium_types(id, name)')` for list endpoint
 - Use `.select('*, aquarium_type:aquarium_types(id, name, description)')` for get endpoint
 - Verify ownership by filtering with `.eq('user_id', userId)` in all queries
@@ -446,14 +458,15 @@ export const GET: APIRoute = async ({ request, locals }) => {
   // 3. Call service.listAquariums()
   // 4. Return 200 with AquariumsListResponseDTO
   // 5. Handle errors (400, 401, 500)
-}
+};
 ```
 
 **Validation schema**:
+
 ```typescript
 const listQuerySchema = z.object({
-  sort: z.enum(['name', 'created_at']).optional().default('created_at'),
-  order: z.enum(['asc', 'desc']).optional().default('desc')
+  sort: z.enum(["name", "created_at"]).optional().default("created_at"),
+  order: z.enum(["asc", "desc"]).optional().default("desc"),
 });
 ```
 
@@ -464,19 +477,23 @@ const listQuerySchema = z.object({
 Create new file with three handlers: `GET`, `PATCH`, `DELETE`
 
 **Shared validation**:
+
 ```typescript
-const uuidSchema = z.string().uuid('Invalid aquarium ID format');
-const updateAquariumSchema = z.object({
-  name: z.string().min(1, 'Name must not be empty').optional(),
-  aquarium_type_id: z.string().uuid('Invalid aquarium type ID').optional(),
-  description: z.string().optional(),
-  volume: z.number().positive('Volume must be positive').optional()
-}).refine(data => Object.keys(data).length > 0, {
-  message: 'At least one field must be provided'
-});
+const uuidSchema = z.string().uuid("Invalid aquarium ID format");
+const updateAquariumSchema = z
+  .object({
+    name: z.string().min(1, "Name must not be empty").optional(),
+    aquarium_type_id: z.string().uuid("Invalid aquarium type ID").optional(),
+    description: z.string().optional(),
+    volume: z.number().positive("Volume must be positive").optional(),
+  })
+  .refine((data) => Object.keys(data).length > 0, {
+    message: "At least one field must be provided",
+  });
 ```
 
 **GET handler**:
+
 ```typescript
 export const GET: APIRoute = async ({ params, locals }) => {
   // 1. Validate params.id
@@ -484,10 +501,11 @@ export const GET: APIRoute = async ({ params, locals }) => {
   // 3. Call service.getAquarium()
   // 4. Return 200 with AquariumResponseDTO
   // 5. Handle errors (400, 401, 403, 404, 500)
-}
+};
 ```
 
 **PATCH handler**:
+
 ```typescript
 export const PATCH: APIRoute = async ({ params, request, locals }) => {
   // 1. Validate params.id
@@ -496,10 +514,11 @@ export const PATCH: APIRoute = async ({ params, request, locals }) => {
   // 4. Call service.updateAquarium()
   // 5. Return 200 with UpdateAquariumResponseDTO
   // 6. Handle errors (400, 401, 403, 404, 409, 500)
-}
+};
 ```
 
 **DELETE handler**:
+
 ```typescript
 export const DELETE: APIRoute = async ({ params, locals }) => {
   // 1. Validate params.id
@@ -507,7 +526,7 @@ export const DELETE: APIRoute = async ({ params, locals }) => {
   // 3. Call service.deleteAquarium()
   // 4. Return 204 No Content
   // 5. Handle errors (400, 401, 403, 404, 500)
-}
+};
 ```
 
 ### Step 4: Implement Error Response Helper (Optional)
@@ -525,11 +544,11 @@ export function errorResponse(
 ): Response {
   return new Response(
     JSON.stringify({
-      error: { code, message, details }
+      error: { code, message, details },
     } as ErrorResponseDTO),
     {
       status,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { "Content-Type": "application/json" },
     }
   );
 }
@@ -545,19 +564,19 @@ try {
 } catch (error) {
   if (error instanceof Error) {
     switch (error.message) {
-      case 'FORBIDDEN':
-        return errorResponse('FORBIDDEN', 'You do not have permission to access this aquarium', 403);
-      case 'NOT_FOUND':
-        return errorResponse('NOT_FOUND', 'Aquarium not found', 404);
-      case 'DUPLICATE_AQUARIUM_NAME':
-        return errorResponse('CONFLICT', 'An aquarium with this name already exists', 409);
-      case 'AQUARIUM_TYPE_NOT_FOUND':
-        return errorResponse('NOT_FOUND', 'Aquarium type not found', 404);
+      case "FORBIDDEN":
+        return errorResponse("FORBIDDEN", "You do not have permission to access this aquarium", 403);
+      case "NOT_FOUND":
+        return errorResponse("NOT_FOUND", "Aquarium not found", 404);
+      case "DUPLICATE_AQUARIUM_NAME":
+        return errorResponse("CONFLICT", "An aquarium with this name already exists", 409);
+      case "AQUARIUM_TYPE_NOT_FOUND":
+        return errorResponse("NOT_FOUND", "Aquarium type not found", 404);
     }
   }
-  
-  console.error('Unexpected error:', error);
-  return errorResponse('INTERNAL_SERVER_ERROR', 'An unexpected error occurred', 500);
+
+  console.error("Unexpected error:", error);
+  return errorResponse("INTERNAL_SERVER_ERROR", "An unexpected error occurred", 500);
 }
 ```
 
@@ -606,6 +625,7 @@ Update the project's API documentation (if exists) or create HTTP test files:
 **File**: `aquarium.http` (update existing)
 
 Add test cases for new endpoints:
+
 ```http
 ### List Aquariums
 GET http://localhost:4321/api/aquariums
@@ -663,4 +683,3 @@ Before considering the implementation complete:
 - **Soft deletes**: Not implemented in MVP. Aquariums are permanently deleted.
 - **Audit logging**: Not implemented in MVP. Consider adding `updated_at` triggers in future.
 - **updated_at field**: The database schema should have an `updated_at` field that auto-updates. Verify this is in place or add a trigger.
-

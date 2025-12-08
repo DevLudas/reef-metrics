@@ -38,8 +38,6 @@ export const POST: APIRoute = async () => {
       },
     });
   } catch (error) {
-    console.error("OpenRouter test error:", error);
-
     return new Response(
       JSON.stringify({
         error: error instanceof Error ? error.message : "Unknown error",

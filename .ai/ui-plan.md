@@ -7,73 +7,78 @@ The Reef-Metrics application is designed as a single-page application (SPA) with
 ## 2. View List
 
 ### 2.1. Login View
+
 - **View Path:** `/login`
 - **Main Purpose:** To allow users to authenticate and access their dashboard (US-002).
 - **Key Information:** Email and password input fields.
 - **Key View Components:**
-    - Login form with fields for email and password.
-    - "Log In" button.
-    - Link to the registration view.
+  - Login form with fields for email and password.
+  - "Log In" button.
+  - Link to the registration view.
 - **UX, Accessibility, and Security:**
-    - **UX:** Clear error messages for failed login attempts (e.g., "Invalid credentials"). Autofocus on the email field.
-    - **Accessibility:** Proper form labeling (`<label>`), input types (`type="email"`, `type="password"`), and ARIA attributes for validation feedback.
-    - **Security:** All communication with the authentication endpoint will be over HTTPS.
+  - **UX:** Clear error messages for failed login attempts (e.g., "Invalid credentials"). Autofocus on the email field.
+  - **Accessibility:** Proper form labeling (`<label>`), input types (`type="email"`, `type="password"`), and ARIA attributes for validation feedback.
+  - **Security:** All communication with the authentication endpoint will be over HTTPS.
 
 ### 2.2. Registration View
+
 - **View Path:** `/register`
 - **Main Purpose:** To allow new users to create an account (US-001).
 - **Key Information:** Email and password input fields.
 - **Key View Components:**
-    - Registration form with fields for email and password.
-    - "Register" button.
-    - Link to the login view.
+  - Registration form with fields for email and password.
+  - "Register" button.
+  - Link to the login view.
 - **UX, Accessibility, and Security:**
-    - **UX:** Real-time validation for password strength and email format. Clear success message upon registration.
-    - **Accessibility:** Use of `aria-describedby` to associate validation messages with inputs.
-    - **Security:** Enforce password complexity rules on the client-side as a preliminary check.
+  - **UX:** Real-time validation for password strength and email format. Clear success message upon registration.
+  - **Accessibility:** Use of `aria-describedby` to associate validation messages with inputs.
+  - **Security:** Enforce password complexity rules on the client-side as a preliminary check.
 
 ### 2.3. Dashboard View
+
 - **View Path:** `/`
 - **Main Purpose:** To provide an at-a-glance overview of the latest measurements for the selected aquarium (US-012). This is the main landing page after login.
 - **Key Information:**
-    - Latest measurement values for key parameters (e.g., Temperature, pH, Salinity).
-    - Visual indicators for parameters that are outside their optimal range.
-    - Name of the currently selected aquarium.
+  - Latest measurement values for key parameters (e.g., Temperature, pH, Salinity).
+  - Visual indicators for parameters that are outside their optimal range.
+  - Name of the currently selected aquarium.
 - **Key View Components:**
-    - **Aquarium Selector:** A dropdown in the top bar to switch between aquariums (US-006).
-    - **Parameter Cards:** A grid of cards, each representing a single parameter and its latest value.
-    - **"Add Measurement" Button:** A primary call-to-action to open the bulk measurement form.
-    - **AI Recommendation Drawer:** A slide-out panel to display AI-powered advice when a parameter card is clicked (US-013).
-    - **Empty State:** A message displayed if the user has no aquariums (prompting to add one, US-005) or if the selected aquarium has no measurements.
+  - **Aquarium Selector:** A dropdown in the top bar to switch between aquariums (US-006).
+  - **Parameter Cards:** A grid of cards, each representing a single parameter and its latest value.
+  - **"Add Measurement" Button:** A primary call-to-action to open the bulk measurement form.
+  - **AI Recommendation Drawer:** A slide-out panel to display AI-powered advice when a parameter card is clicked (US-013).
+  - **Empty State:** A message displayed if the user has no aquariums (prompting to add one, US-005) or if the selected aquarium has no measurements.
 - **UX, Accessibility, and Security:**
-    - **UX:** Use skeleton loaders while data is being fetched. The grid layout adapts to a single column on mobile devices.
-    - **Accessibility:** Parameter cards will be keyboard-focusable. The drawer will trap focus and be dismissible with the `Esc` key.
-    - **Security:** Data is fetched for the authenticated user only.
+  - **UX:** Use skeleton loaders while data is being fetched. The grid layout adapts to a single column on mobile devices.
+  - **Accessibility:** Parameter cards will be keyboard-focusable. The drawer will trap focus and be dismissible with the `Esc` key.
+  - **Security:** Data is fetched for the authenticated user only.
 
 ### 2.4. Measurement History View
+
 - **View Path:** `/history`
 - **Main Purpose:** To allow users to view, edit, and delete past measurements in a detailed, paginated format (US-010, US-011, US-014).
 - **Key Information:** A chronological list of all measurements for the selected aquarium.
 - **Key View Components:**
-    - **History Table:** A table displaying measurement date, parameter values, and action buttons.
-    - **Pagination Controls:** To navigate through the measurement history.
-    - **Edit/Delete Buttons:** For each measurement entry.
+  - **History Table:** A table displaying measurement date, parameter values, and action buttons.
+  - **Pagination Controls:** To navigate through the measurement history.
+  - **Edit/Delete Buttons:** For each measurement entry.
 - **UX, Accessibility, and Security:**
-    - **UX:** A confirmation dialog will appear before deleting a measurement to prevent accidental data loss.
-    - **Accessibility:** The table will be structured semantically (`<thead>`, `<tbody>`, `<th>` with `scope` attributes) for screen reader compatibility.
-    - **Security:** Users can only access and modify their own measurement data.
+  - **UX:** A confirmation dialog will appear before deleting a measurement to prevent accidental data loss.
+  - **Accessibility:** The table will be structured semantically (`<thead>`, `<tbody>`, `<th>` with `scope` attributes) for screen reader compatibility.
+  - **Security:** Users can only access and modify their own measurement data.
 
 ### 2.5. Profile View
+
 - **View Path:** `/profile`
 - **Main Purpose:** To allow users to manage their account settings, such as changing their password (US-004).
 - **Key Information:** User's email address.
 - **Key View Components:**
-    - **Change Password Form:** Fields for the current password and the new password.
-    - **Logout Button:** To end the user session (US-003).
+  - **Change Password Form:** Fields for the current password and the new password.
+  - **Logout Button:** To end the user session (US-003).
 - **UX, Accessibility, and Security:**
-    - **UX:** Clear feedback on successful password change or errors.
-    - **Accessibility:** All form fields will have proper labels.
-    - **Security:** Requires the current password to authorize a password change.
+  - **UX:** Clear feedback on successful password change or errors.
+  - **Accessibility:** All form fields will have proper labels.
+  - **Security:** Requires the current password to authorize a password change.
 
 ## 3. User Journey Map
 
@@ -92,14 +97,14 @@ The Reef-Metrics application is designed as a single-page application (SPA) with
 ## 4. Layout and Navigation Structure
 
 - **Main Layout:** A two-part structure composed of a fixed side navigation bar and a main content area. A top bar sits above the main content area.
-    - **Side Navigation:** Always visible on desktop screens, potentially collapsible into a "hamburger" menu on mobile. It contains links to:
-        - **Dashboard (`/`)**
-        - **History (`/history`)**
-    - **Top Bar:** Contains:
-        - **Aquarium Selector:** A dropdown to switch the active aquarium (US-006).
-        - **User Menu:** A dropdown menu triggered by a user avatar/icon, containing links to:
-            - **Profile (`/profile`)**
-            - **Logout**
+  - **Side Navigation:** Always visible on desktop screens, potentially collapsible into a "hamburger" menu on mobile. It contains links to:
+    - **Dashboard (`/`)**
+    - **History (`/history`)**
+  - **Top Bar:** Contains:
+    - **Aquarium Selector:** A dropdown to switch the active aquarium (US-006).
+    - **User Menu:** A dropdown menu triggered by a user avatar/icon, containing links to:
+      - **Profile (`/profile`)**
+      - **Logout**
 - **Routing:** The application will use client-side routing managed by Astro to enable fast, seamless transitions between views without full page reloads.
 
 ## 5. Key Components
@@ -111,4 +116,3 @@ The Reef-Metrics application is designed as a single-page application (SPA) with
 - **Global Error/Notification (`Toast`):** A non-intrusive pop-up component used for providing feedback, such as API errors or success messages (e.g., "Measurement saved successfully").
 - **Loading Indicators (`Spinner`, `Skeleton`):** Used to improve perceived performance during data fetching. Skeletons will mimic the layout of content (e.g., parameter cards) before it loads.
 - **Confirmation Dialog:** A modal dialog that prompts the user for confirmation before executing a destructive action, such as deleting a measurement or an aquarium (US-008, US-011).
-

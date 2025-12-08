@@ -1,6 +1,7 @@
 # Mermaid Diagram - Authentication Architecture
 
 ## Overview
+
 This diagram visualizes the complete authentication architecture for the ReefMetrics application, showing the interaction between the browser, middleware, Astro API endpoints, and Supabase Auth service throughout the entire authentication lifecycle.
 
 ## Diagram
@@ -9,13 +10,13 @@ This diagram visualizes the complete authentication architecture for the ReefMet
 %%{init: {'theme': 'dark', 'themeVariables': {'primaryTextColor': '#fff', 'primaryBorderColor': '#fff', 'background': '#1a1a1a', 'mainBkg': '#2d3748', 'secondBkg': '#4a5568'}}}%%
 sequenceDiagram
     autonumber
-    
+
     participant Browser
     participant Middleware as Middleware<br/>(Session Manager)
     participant API as Astro API<br/>(Auth Endpoints)
     participant SupaAuth as Supabase Auth<br/>(Authentication)
     participant Database as Database<br/>(User Profiles)
-    
+
     rect rgb(70, 120, 180)
         Note over Browser,Database: User Registration Flow
         Browser->>API: POST /api/auth/register<br/>(email, password, name)
@@ -46,7 +47,7 @@ sequenceDiagram
         end
         deactivate API
     end
-    
+
     rect rgb(60, 140, 100)
         Note over Browser,Database: User Login Flow
         Browser->>API: POST /api/auth/login<br/>(email, password)
@@ -73,7 +74,7 @@ sequenceDiagram
         end
         deactivate API
     end
-    
+
     rect rgb(180, 120, 60)
         Note over Browser,Database: Request Validation Flow
         Browser->>Middleware: GET /dashboard<br/>(with session cookie)
@@ -97,7 +98,7 @@ sequenceDiagram
         end
         deactivate Middleware
     end
-    
+
     rect rgb(180, 80, 80)
         Note over Browser,Database: Password Reset Flow
         Browser->>API: POST /api/auth/<br/>forgot-password<br/>(email)
@@ -121,7 +122,7 @@ sequenceDiagram
         end
         deactivate API
     end
-    
+
     rect rgb(160, 80, 120)
         Note over Browser,Database: Reset Password Completion
         Browser->>Browser: Click reset link<br/>in email
@@ -141,7 +142,7 @@ sequenceDiagram
             API-->>Browser: 400 Bad Request<br/>(show error)
         end
         deactivate API
-        
+
         Browser->>API: POST /api/auth/<br/>reset-password<br/>(token, new_password)
         activate API
         API->>API: Validate new password
@@ -158,7 +159,7 @@ sequenceDiagram
         end
         deactivate API
     end
-    
+
     rect rgb(70, 100, 140)
         Note over Browser,Database: User Logout Flow
         Browser->>API: POST /api/auth/logout
@@ -175,7 +176,7 @@ sequenceDiagram
         Browser->>Browser: Clear session cookie
         Browser->>Browser: Redirect to /login
     end
-    
+
     rect rgb(120, 80, 140)
         Note over Browser,Database: Protected Page Access
         Browser->>Middleware: GET /protected<br/>(with valid session)
@@ -183,7 +184,7 @@ sequenceDiagram
         Middleware->>Middleware: Verify user in context.locals
         Middleware-->>Browser: 200 OK (render page)
         deactivate Middleware
-        
+
         Browser->>Middleware: GET /protected<br/>(no session)
         activate Middleware
         Middleware->>Middleware: No user in context
@@ -195,14 +196,18 @@ sequenceDiagram
 ## Architecture Components
 
 ### Browser
+
 The client-side user agent that:
+
 - Initiates authentication requests
 - Stores session cookies
 - Handles redirects
 - Displays UI to users
 
 ### Middleware
+
 Located in `src/middleware/index.ts`, responsible for:
+
 - Verifying session cookies on every request
 - Managing token refresh before expiration
 - Attaching user information to `context.locals`
@@ -210,7 +215,9 @@ Located in `src/middleware/index.ts`, responsible for:
 - Protecting routes by checking session validity
 
 ### Astro API
+
 Server-side endpoints in `src/pages/api/auth/`, handling:
+
 - `POST /api/auth/register` - User registration
 - `POST /api/auth/login` - User login
 - `POST /api/auth/logout` - User logout
@@ -218,13 +225,16 @@ Server-side endpoints in `src/pages/api/auth/`, handling:
 - `POST /api/auth/reset-password` - Password reset completion
 
 Each endpoint:
+
 - Validates input using Zod schemas
 - Uses appropriate HTTP status codes
 - Returns user-friendly error messages
 - Interacts with Supabase Auth
 
 ### Supabase Auth
+
 Third-party authentication service that:
+
 - Manages user accounts and credentials
 - Generates and validates tokens
 - Handles password reset process
@@ -232,7 +242,9 @@ Third-party authentication service that:
 - Stores encrypted passwords
 
 ### Database
+
 PostgreSQL database (via Supabase) that:
+
 - Stores user profiles in `profiles` table
 - Created automatically via trigger on `auth.users`
 - Stores additional user metadata (name, preferences)
@@ -251,19 +263,19 @@ PostgreSQL database (via Supabase) that:
 
 ```
 Registration:
-  Form Input → Validation → Supabase SignUp → Profile Creation → 
+  Form Input → Validation → Supabase SignUp → Profile Creation →
   Session Cookie → Auto Login → Redirect to Dashboard
 
 Login:
-  Form Input → Validation → Supabase SignIn → Session Cookie → 
+  Form Input → Validation → Supabase SignIn → Session Cookie →
   Redirect to Dashboard
 
 Session Validation:
-  Middleware → Cookie Check → Token Verification → Token Refresh → 
+  Middleware → Cookie Check → Token Verification → Token Refresh →
   User Context Attachment → Route Access
 
 Password Reset:
-  Email Input → Validation → Email Verification → Reset Link → 
+  Email Input → Validation → Email Verification → Reset Link →
   Token Validation → New Password → Password Update → Success
 
 Logout:
@@ -276,9 +288,8 @@ Logout:
 - **Auth Service**: `src/lib/services/auth.service.ts`
 - **Middleware**: `src/middleware/index.ts`
 - **Supabase Client**: `src/db/supabase.client.ts`
-- **React Components**: 
+- **React Components**:
   - `src/components/auth/LoginForm.tsx`
   - `src/components/auth/RegisterForm.tsx`
   - `src/components/auth/ForgotPasswordForm.tsx`
   - `src/components/auth/ResetPasswordForm.tsx`
-

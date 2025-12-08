@@ -11,8 +11,6 @@ import type { APIContext } from "astro";
 import type { GetRecommendationsCommand, RecommendationResponseDTO, ErrorResponseDTO } from "@/types";
 import { getRecommendationsSchema } from "@/lib/validation/recommendation.validation";
 import {
-  calculateDeviation,
-  determineStatus,
   generateRecommendations,
   fetchParameterDetails,
   fetchAquariumWithType,
@@ -20,7 +18,6 @@ import {
   type AIRecommendationContext,
 } from "@/lib/services/ai-recommendations.service";
 import { DEFAULT_USER_ID } from "@/db/supabase.client";
-import { calculateStatus } from "@/lib/utils/parameter-status.ts";
 
 export const prerender = false;
 

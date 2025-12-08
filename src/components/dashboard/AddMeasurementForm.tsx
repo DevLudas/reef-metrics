@@ -63,7 +63,7 @@ export function AddMeasurementForm({ isOpen, onClose, aquariumId, onSuccess, onE
           };
         });
         setMeasurements(initialMeasurements);
-      } catch (error) {
+      } catch {
         onError("Failed to load parameters. Please try again.");
       } finally {
         setIsLoadingParameters(false);

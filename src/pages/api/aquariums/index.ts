@@ -60,7 +60,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
         headers: { "Content-Type": "application/json" },
       }
     );
-  } catch (error) {
+  } catch {
     return errorResponse("INTERNAL_SERVER_ERROR", "An unexpected error occurred", 500);
   }
 };

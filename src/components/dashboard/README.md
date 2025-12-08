@@ -44,12 +44,14 @@ index.astro
 Main container component that receives data as props and orchestrates the dashboard layout.
 
 **Props:**
+
 - `aquariums`: List of user's aquariums
 - `selectedAquariumId`: Currently selected aquarium ID
 - `parameters`: Calculated parameter statuses with measurements
 - `lastMeasurementTime`: Most recent measurement timestamp
 
 **State:**
+
 - `selectedParameterId`: For drawer interaction
 - `isDrawerOpen`: Drawer visibility state
 
@@ -58,6 +60,7 @@ Main container component that receives data as props and orchestrates the dashbo
 Displays aquarium selector and action buttons.
 
 **Props:**
+
 - `aquariums`: List of aquariums for the selector
 - `selectedAquariumId`: Currently selected aquarium
 - `lastMeasurementTime`: For displaying last update time
@@ -69,6 +72,7 @@ Displays aquarium selector and action buttons.
 Grid layout for displaying parameter cards.
 
 **Props:**
+
 - `parameters`: Array of parameter status view models
 - `onParameterClick`: Callback when a card is clicked
 
@@ -77,6 +81,7 @@ Grid layout for displaying parameter cards.
 Individual parameter card showing current value, status, and deviation.
 
 **Props:**
+
 - `parameter`: Parameter status view model
 - `onClick`: Callback when card is clicked
 
@@ -85,6 +90,7 @@ Individual parameter card showing current value, status, and deviation.
 Side drawer for displaying AI-powered recommendations for a parameter.
 
 **Props:**
+
 - `isOpen`: Drawer visibility
 - `parameter`: Selected parameter details
 - `aquariumId`: Current aquarium ID
@@ -105,9 +111,11 @@ Server-side service for aggregating dashboard data.
 **Location:** `/src/lib/services/dashboard.service.ts`
 
 **Methods:**
+
 - `getDashboardData(userId, preferredAquariumId)`: Fetches and aggregates all dashboard data
 
 **Features:**
+
 - Fetches aquariums, measurements, and optimal values in parallel
 - Calculates parameter statuses with color coding
 - Sorts parameters by priority (critical → warning → normal → no data)
@@ -157,18 +165,21 @@ This triggers a page reload with fresh data from the database.
 The dashboard was refactored from a client-side hook-based architecture to server-side rendering:
 
 ### Before (Client-Side)
+
 - Used `useDashboard` hook with useState/useEffect
 - Fetched data via API endpoints on mount
 - Client-side state management
 - Multiple re-renders and loading states
 
 ### After (Server-Side)
+
 - Data fetched in Astro page during SSR
 - Props passed to React component
 - Minimal client-side state (only UI interactions)
 - Single render with complete data
 
 ### Removed Files
+
 - `hooks/useDashboard.ts` - No longer needed
 
 ## Future Enhancements
@@ -178,4 +189,3 @@ The dashboard was refactored from a client-side hook-based architecture to serve
 - Add real-time updates using Supabase subscriptions
 - Add historical charts for parameter trends
 - Implement parameter alerts and notifications
-

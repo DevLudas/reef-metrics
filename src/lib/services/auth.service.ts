@@ -27,7 +27,7 @@ export class AuthService {
         id: user.id,
         email: user.email || "",
       };
-    } catch (error) {
+    } catch {
       return null;
     }
   }
@@ -37,7 +37,7 @@ export class AuthService {
    * Invalidates the session and clears local storage
    */
   async signOut(): Promise<void> {
-    const { error } = await this.supabase.auth.signOut();
+    await this.supabase.auth.signOut();
 
     if (error) {
       throw new Error(`Failed to sign out: ${error.message}`);

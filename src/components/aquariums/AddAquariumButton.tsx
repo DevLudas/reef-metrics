@@ -24,11 +24,7 @@ export function AddAquariumButton() {
         </svg>
         <span className="hidden sm:inline">Add New Aquarium</span>
       </Button>
-      <AquariumFormModal
-        isOpen={isModalOpen}
-        setIsOpen={setIsModalOpen}
-        onSuccess={handleSuccess}
-      />
+      <AquariumFormModal isOpen={isModalOpen} setIsOpen={setIsModalOpen} onSuccess={handleSuccess} />
     </>
   );
 }
