@@ -1,22 +1,14 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import type { AquariumTypeDTO, CreateAquariumCommand } from "@/types";
+import { aquariumFormSchema, type AquariumFormData } from "@/lib/validation/aquarium.validation";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 
-const aquariumFormSchema = z.object({
-  name: z.string().min(3, "Name must be at least 3 characters").max(50, "Name is too long"),
-  aquarium_type_id: z.string().uuid("Please select an aquarium type"),
-  volume: z.coerce.number().positive("Volume must be a positive number").optional(),
-  description: z.string().max(255, "Description is too long").optional(),
-});
-
-type AquariumFormData = z.infer<typeof aquariumFormSchema>;
 
 interface AquariumFormProps {
   onSubmit: (data: CreateAquariumCommand) => Promise<void>;

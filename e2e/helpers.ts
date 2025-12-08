@@ -1,4 +1,4 @@
-import { Page, expect } from '@playwright/test';
+import { Page } from '@playwright/test';
 
 /**
  * Test user fixtures for authentication tests
@@ -64,7 +64,7 @@ export async function createAquarium(page: Page, aquariumData: { name: string; t
 	await page.click('button[type="submit"]:has-text("Create")');
 
 	// Wait for success
-	await expect(page.locator(`text=${aquariumData.name}`)).toBeVisible();
+	await page.locator(`text=${aquariumData.name}`).waitFor({ state: 'visible' });
 }
 
 /**
