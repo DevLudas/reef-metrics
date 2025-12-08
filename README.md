@@ -11,6 +11,7 @@ A web application for marine aquarium hobbyists to monitor water parameters, ana
 - [Tech Stack](#tech-stack)
 - [Getting Started Locally](#getting-started-locally)
 - [Available Scripts](#available-scripts)
+- [Testing](#testing)
 - [Project Scope](#project-scope)
 - [Project Status](#project-status)
 - [License](#license)
@@ -94,6 +95,32 @@ The following scripts are available in `package.json`:
 - `npm run lint`: Lints the codebase using ESLint.
 - `npm run lint:fix`: Lints and automatically fixes issues.
 - `npm run format`: Formats the code using Prettier.
+- `npm run test`: Runs all unit and integration tests.
+- `npm run test:watch`: Runs tests in watch mode for development.
+- `npm run test:coverage`: Generates test coverage report.
+
+## Testing
+
+The ReefMetrics project follows a comprehensive multi-layered testing approach to ensure functionality, reliability, and quality:
+
+### Unit Testing
+Unit tests verify individual functions and modules in isolation using **Vitest**. Tests focus on:
+- Utility functions (e.g., `parameter-status.ts`)
+- Zod validation schemas
+- Individual service methods with mocked dependencies
+- Type safety with TypeScript
+
+### Integration Testing
+Integration tests validate the interaction between different parts of the application, including:
+- Service layer integration with the Supabase database
+- API endpoints' interaction with their respective services
+- Data flow between components and services
+
+### Test Tools
+- **Vitest**: Modern, fast unit and integration testing framework for Vite-based projects
+- **Playwright**: E2E and API testing for comprehensive user flow validation
+
+For detailed testing information, see the [Test Plan](./.ai/test-plan.md).
 
 ## Project Scope
 

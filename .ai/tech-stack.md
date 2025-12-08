@@ -18,3 +18,31 @@
 ## CI/CD and Hosting:
 - GitHub Actions for creating CI/CD pipelines.
 - DigitalOcean for hosting the application via a Docker image.
+
+## Testing and Quality Assurance:
+
+### Unit Testing
+- **Framework**: Vitest
+- **Targets**:
+  - Utility functions (e.g., `parameter-status.ts`)
+  - Zod validation schemas
+  - Individual service methods with mocked dependencies
+  - Type safety verification with TypeScript
+- **Purpose**: Verify individual functions and modules in isolation to ensure correctness at the unit level.
+
+### Integration Testing
+- **Framework**: Vitest
+- **Targets**:
+  - Service layer integration with the Supabase database
+  - API endpoints' interaction with their respective services
+  - Data flow between components and services
+- **Purpose**: Validate the interaction between different parts of the application to ensure components work together correctly.
+
+### E2E and API Testing
+- **Framework**: Playwright
+- **Purpose**: Simulate real user scenarios from start to finish and validate the full functionality of the API layer independently of the UI.
+
+### Testing Tools Summary
+- **Vitest**: Modern, fast unit and integration testing framework optimized for Vite-based projects like Astro.
+- **Playwright**: Excellent choice for modern web applications with robust APIs for browser automation, network request interception, and API testing.
+
