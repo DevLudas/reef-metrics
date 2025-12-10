@@ -17,7 +17,7 @@ import {
   AI_DISCLAIMER,
   type AIRecommendationContext,
 } from "@/lib/services/ai-recommendations.service";
-import { DEFAULT_USER_ID } from "@/db/supabase.client";
+import { calculateStatus } from "@/lib/utils/parameter-status.ts";
 
 export const prerender = false;
 
@@ -29,7 +29,7 @@ export const prerender = false;
 export async function POST(context: APIContext): Promise<Response> {
   try {
     // Step 1: Extract user from context.locals (set by middleware)
-    const user = DEFAULT_USER_ID;
+    const user = context.locals.user;
 
     // Step 2: Validate authentication
     if (!user) {
@@ -133,7 +133,7 @@ export async function POST(context: APIContext): Promise<Response> {
     }
 
     // Step 8: Verify ownership
-    if (aquarium.user_id !== user) {
+    if (aquarium.user_id !== user.id) {
       const errorResponse: ErrorResponseDTO = {
         error: {
           code: "FORBIDDEN",

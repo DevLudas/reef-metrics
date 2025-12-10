@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { createSupabaseServerInstance } from "@/db/supabase.client";
 import { AuthService } from "@/lib/services/auth.service";
 
 export const prerender = false;
@@ -7,9 +8,15 @@ export const prerender = false;
  * POST /api/auth/logout
  * Signs out the current user and invalidates their session
  */
-export const POST: APIRoute = async ({ locals }) => {
+export const POST: APIRoute = async ({ request, cookies }) => {
   try {
-    const authService = new AuthService(locals.supabase);
+    // Create Supabase server instance with cookie support
+    const supabase = createSupabaseServerInstance({
+      cookies,
+      headers: request.headers,
+    });
+
+    const authService = new AuthService(supabase);
     await authService.signOut();
 
     return new Response(

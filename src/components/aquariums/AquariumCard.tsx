@@ -186,7 +186,7 @@ export function AquariumCard({ aquarium, onAquariumDeleted }: AquariumCardProps)
           {/* Divider */}
           <div className="border-t pt-4 mt-auto">
             <a
-              href={`/?aquarium=${aquarium.id}`}
+              href={`/dashboard?aquarium=${aquarium.id}`}
               className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-sm"
             >
               <span>View Dashboard</span>

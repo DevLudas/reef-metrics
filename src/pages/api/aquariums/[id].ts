@@ -1,7 +1,6 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
 import { AquariumService } from "@/lib/services/aquarium.service";
-import { DEFAULT_USER_ID } from "@/db/supabase.client";
 import { errorResponse } from "@/lib/utils";
 import type { UpdateAquariumCommand, AquariumResponseDTO, UpdateAquariumResponseDTO } from "@/types";
 
@@ -22,7 +21,13 @@ const updateAquariumSchema = z
 
 export const GET: APIRoute = async ({ params, locals }) => {
   try {
-    // Step 1: Validate params.id
+    // Step 1: Get authenticated user
+    const user = locals.user;
+    if (!user) {
+      return errorResponse("UNAUTHORIZED", "User not authenticated", 401);
+    }
+
+    // Step 2: Validate params.id
     const validation = uuidSchema.safeParse(params.id);
     if (!validation.success) {
       return errorResponse("VALIDATION_ERROR", "Invalid aquarium ID format", 400);
@@ -30,12 +35,9 @@ export const GET: APIRoute = async ({ params, locals }) => {
 
     const aquariumId = validation.data;
 
-    // Step 2: Get user ID
-    const userId = DEFAULT_USER_ID;
-
     // Step 3: Call service.getAquarium()
     const aquariumService = new AquariumService(locals.supabase);
-    const aquarium = await aquariumService.getAquarium(userId, aquariumId);
+    const aquarium = await aquariumService.getAquarium(user.id, aquariumId);
 
     // Step 4: Return 200 with AquariumResponseDTO
     return new Response(
@@ -75,7 +77,13 @@ export const GET: APIRoute = async ({ params, locals }) => {
 
 export const PATCH: APIRoute = async ({ params, request, locals }) => {
   try {
-    // Step 1: Validate params.id
+    // Step 1: Get authenticated user
+    const user = locals.user;
+    if (!user) {
+      return errorResponse("UNAUTHORIZED", "User not authenticated", 401);
+    }
+
+    // Step 2: Validate params.id
     const idValidation = uuidSchema.safeParse(params.id);
     if (!idValidation.success) {
       return errorResponse("VALIDATION_ERROR", "Invalid aquarium ID format", 400);
@@ -83,7 +91,7 @@ export const PATCH: APIRoute = async ({ params, request, locals }) => {
 
     const aquariumId = idValidation.data;
 
-    // Step 2: Parse and validate request body
+    // Step 3: Parse and validate request body
     const body = await request.json();
     const bodyValidation = updateAquariumSchema.safeParse(body);
 
@@ -101,12 +109,9 @@ export const PATCH: APIRoute = async ({ params, request, locals }) => {
 
     const command: UpdateAquariumCommand = bodyValidation.data;
 
-    // Step 3: Get user ID
-    const userId = DEFAULT_USER_ID;
-
     // Step 4: Call service.updateAquarium()
     const aquariumService = new AquariumService(locals.supabase);
-    const aquarium = await aquariumService.updateAquarium(userId, aquariumId, command);
+    const aquarium = await aquariumService.updateAquarium(user.id, aquariumId, command);
 
     // Step 5: Return 200 with UpdateAquariumResponseDTO
     return new Response(
@@ -139,7 +144,13 @@ export const PATCH: APIRoute = async ({ params, request, locals }) => {
 
 export const DELETE: APIRoute = async ({ params, locals }) => {
   try {
-    // Step 1: Validate params.id
+    // Step 1: Get authenticated user
+    const user = locals.user;
+    if (!user) {
+      return errorResponse("UNAUTHORIZED", "User not authenticated", 401);
+    }
+
+    // Step 2: Validate params.id
     const validation = uuidSchema.safeParse(params.id);
     if (!validation.success) {
       return errorResponse("VALIDATION_ERROR", "Invalid aquarium ID format", 400);
@@ -147,12 +158,9 @@ export const DELETE: APIRoute = async ({ params, locals }) => {
 
     const aquariumId = validation.data;
 
-    // Step 2: Get user ID
-    const userId = DEFAULT_USER_ID;
-
     // Step 3: Call service.deleteAquarium()
     const aquariumService = new AquariumService(locals.supabase);
-    await aquariumService.deleteAquarium(userId, aquariumId);
+    await aquariumService.deleteAquarium(user.id, aquariumId);
 
     // Step 4: Return 204 No Content
     return new Response(null, {

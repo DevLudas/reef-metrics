@@ -1,12 +1,78 @@
 import type { SupabaseClient } from "@/db/supabase.client";
-import type { UserDTO } from "@/types";
+import type { UserDTO, SignInCommand, AuthResponseDTO } from "@/types";
 
 /**
  * Authentication service for user management
- * Handles user sessions, sign out, and user data retrieval
+ * Handles user sessions, sign in, sign out, and user data retrieval
  */
 export class AuthService {
   constructor(private supabase: SupabaseClient) {}
+
+  /**
+   * Sign up a new user with email and password
+   * Returns user and session information
+   */
+  async signUp(command: SignInCommand): Promise<AuthResponseDTO> {
+    const { email, password } = command;
+
+    const { data, error } = await this.supabase.auth.signUp({
+      email,
+      password,
+    });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    if (!data.user || !data.session) {
+      throw new Error("Failed to sign up");
+    }
+
+    return {
+      user: {
+        id: data.user.id,
+        email: data.user.email || "",
+      },
+      session: {
+        access_token: data.session.access_token,
+        refresh_token: data.session.refresh_token,
+        expires_at: data.session.expires_at || 0,
+      },
+    };
+  }
+
+  /**
+   * Sign in a user with email and password
+   * Returns user and session information
+   */
+  async signIn(command: SignInCommand): Promise<AuthResponseDTO> {
+    const { email, password } = command;
+
+    const { data, error } = await this.supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    if (!data.user || !data.session) {
+      throw new Error("Failed to sign in");
+    }
+
+    return {
+      user: {
+        id: data.user.id,
+        email: data.user.email || "",
+      },
+      session: {
+        access_token: data.session.access_token,
+        refresh_token: data.session.refresh_token,
+        expires_at: data.session.expires_at || 0,
+      },
+    };
+  }
 
   /**
    * Get the currently authenticated user

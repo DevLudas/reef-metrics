@@ -2,19 +2,22 @@
 import Layout from "@/layouts/Layout.astro";
 import { AquariumService } from "@/lib/services/aquarium.service";
 import { AquariumGrid } from "@/components/aquariums/AquariumGrid";
-import { DEFAULT_USER_ID } from "@/db/supabase.client";
 import type { AquariumListItemDTO } from "@/types";
+
+// Get authenticated user from middleware
+const { user } = Astro.locals;
+
+// This page is protected by middleware, so user should always exist
+if (!user) {
+  return Astro.redirect("/login");
+}
 
 // Fetch user's aquariums
 const aquariumService = new AquariumService(Astro.locals.supabase);
 let aquariums: AquariumListItemDTO[] = [];
 let error: string | null = null;
 
-try {
-  aquariums = await aquariumService.listAquariums(DEFAULT_USER_ID);
-} catch {
-  error = "Failed to load aquariums. Please try again.";
-}
+aquariums = await aquariumService.listAquariums(user.id);
 ---
 
 <Layout title="My Aquariums">

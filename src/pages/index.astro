@@ -1,64 +1,284 @@
 ---
-import Layout from "@/layouts/Layout.astro";
-import { DashboardContent } from "@/components/dashboard/DashboardContent";
-import DashboardService from "@/lib/services/dashboard.service";
-// For now, we'll use a mock user ID until authentication is implemented
-// TODO: Replace with actual user ID from session
-import { DEFAULT_USER_ID } from "@/db/supabase.client";
+import "../styles/global.css";
+import { Image } from "astro:assets";
+import logo from "@/assets/logo.png";
+import { Button } from "@/components/ui/button";
 
-// Get preferred aquarium from URL parameter
-const preferredAquariumId = Astro.url.searchParams.get("aquarium");
+const pageTitle = "Reef Metrics - Monitor Your Aquarium";
 
-// Fetch dashboard data server-side
-const supabase = Astro.locals.supabase;
-const dashboardService = new DashboardService(supabase);
-
-let dashboardData;
-let error: string | null = null;
-
-try {
-  dashboardData = await dashboardService.getDashboardData(DEFAULT_USER_ID, preferredAquariumId);
-} catch (err) {
-  error = err instanceof Error ? err.message : "Failed to load dashboard";
+// Redirect authenticated users to dashboard
+const { user } = Astro.locals;
+if (user) {
+  return Astro.redirect("/dashboard");
 }
 ---
 
-<Layout>
-  <main class="container mx-auto px-4 py-8">
-    {
-      error ? (
-        <div class="rounded-lg border border-red-200 bg-red-50 p-6">
-          <div class="flex items-start gap-3">
-            <svg
-              class="h-6 w-6 flex-shrink-0 text-red-600"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-            >
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta
+      name="description"
+      content="ReefMetrics - Centralize water parameter monitoring for your marine aquarium with AI-powered recommendations"
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{pageTitle}</title>
+  </head>
+  <body>
+    <header class="border-b border-border bg-background sticky top-0 z-50">
+      <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+        <a href="/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+          <Image src={logo} alt="ReefMetrics Logo" class="h-10 w-auto" />
+          <span class="text-2xl font-bold text-foreground">ReefMetrics</span>
+        </a>
+        <nav class="flex items-center gap-4">
+          <a href="/login" class="text-sm font-medium text-foreground hover:text-primary transition-colors"> Log In </a>
+          <a href="/register">
+            <Button>Sign Up</Button>
+          </a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-16 md:py-24">
+      <!-- Hero Section -->
+      <section class="max-w-4xl mx-auto text-center mb-20">
+        <h1 class="text-5xl md:text-6xl font-bold tracking-tight text-foreground mb-6 leading-tight">
+          Monitor Your Aquarium,<br />
+          <span class="text-primary">Master the Science</span>
+        </h1>
+        <p class="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
+          ReefMetrics centralizes water parameter monitoring for marine aquarists. Track salinity, hardness, calcium,
+          magnesium, phosphates, nitrates, and temperature with AI-powered insights and recommendations.
+        </p>
+        <div class="flex gap-4 justify-center flex-wrap">
+          <a href="/register">
+            <Button size="lg" class="text-base">Get Started Free</Button>
+          </a>
+          <a href="/login">
+            <Button size="lg" variant="outline" class="text-base">Sign In</Button>
+          </a>
+        </div>
+      </section>
+
+      <!-- Features Section -->
+      <section class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-20">
+        <div class="p-6 rounded-lg border border-border bg-card">
+          <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
-                fill-rule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                clip-rule="evenodd"
-              />
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+              ></path>
             </svg>
+          </div>
+          <h3 class="text-lg font-semibold text-foreground mb-2">Track 7 Key Parameters</h3>
+          <p class="text-sm text-muted-foreground">
+            Monitor SG, kH, Ca, Mg, PO₄, NO₃, and temperature all in one place with automatic timestamping.
+          </p>
+        </div>
+
+        <div class="p-6 rounded-lg border border-border bg-card">
+          <div class="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold text-foreground mb-2">Color-Coded Status</h3>
+          <p class="text-sm text-muted-foreground">
+            Instantly see parameter health with green, orange, or red status indicators based on deviation from optimal
+            values.
+          </p>
+        </div>
+
+        <div class="p-6 rounded-lg border border-border bg-card">
+          <div class="w-12 h-12 rounded-lg bg-purple-500/10 flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"
+              ></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold text-foreground mb-2">AI-Powered Insights</h3>
+          <p class="text-sm text-muted-foreground">
+            Get intelligent analysis and general recommendations when parameters deviate from your targets.
+          </p>
+        </div>
+
+        <div class="p-6 rounded-lg border border-border bg-card">
+          <div class="w-12 h-12 rounded-lg bg-amber-500/10 flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold text-foreground mb-2">Historical Tracking</h3>
+          <p class="text-sm text-muted-foreground">
+            Browse your measurement history with an interactive calendar to identify trends and patterns.
+          </p>
+        </div>
+
+        <div class="p-6 rounded-lg border border-border bg-card">
+          <div class="w-12 h-12 rounded-lg bg-red-500/10 flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
+              ></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold text-foreground mb-2">Multiple Aquariums</h3>
+          <p class="text-sm text-muted-foreground">
+            Manage and monitor multiple tanks with customizable target parameters for each aquarium type.
+          </p>
+        </div>
+
+        <div class="p-6 rounded-lg border border-border bg-card">
+          <div class="w-12 h-12 rounded-lg bg-cyan-500/10 flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+              ></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold text-foreground mb-2">Secure & Private</h3>
+          <p class="text-sm text-muted-foreground">
+            Your aquarium data is encrypted and securely stored. Only you can access your measurements and insights.
+          </p>
+        </div>
+      </section>
+
+      <!-- How It Works Section -->
+      <section class="max-w-3xl mx-auto mb-20">
+        <h2 class="text-3xl font-bold text-center text-foreground mb-12">How It Works</h2>
+        <div class="space-y-8">
+          <div class="flex gap-6">
+            <div class="flex-shrink-0">
+              <div
+                class="flex items-center justify-center h-12 w-12 rounded-lg bg-blue-600 text-white font-bold text-lg"
+              >
+                1
+              </div>
+            </div>
             <div>
-              <h3 class="text-lg font-medium text-red-800">Error Loading Dashboard</h3>
-              <p class="mt-1 text-sm text-red-700">{error}</p>
-              <a href="/" class="mt-3 inline-block text-sm font-medium text-red-800 underline hover:text-red-900">
-                Try again
-              </a>
+              <h3 class="text-lg font-semibold text-foreground mb-2">Set Up Your Aquariums</h3>
+              <p class="text-muted-foreground">
+                Create an account and add your aquarium with its type (SPS, LPS, Fish Only, etc.) and preferred target
+                parameters.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex gap-6">
+            <div class="flex-shrink-0">
+              <div
+                class="flex items-center justify-center h-12 w-12 rounded-lg bg-blue-600 text-white font-bold text-lg"
+              >
+                2
+              </div>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-foreground mb-2">Enter Your Test Results</h3>
+              <p class="text-muted-foreground">
+                After testing your water, simply input the seven key parameters into the measurement form. Everything is
+                timestamped automatically.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex gap-6">
+            <div class="flex-shrink-0">
+              <div
+                class="flex items-center justify-center h-12 w-12 rounded-lg bg-blue-600 text-white font-bold text-lg"
+              >
+                3
+              </div>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-foreground mb-2">Get Instant Visual Feedback</h3>
+              <p class="text-muted-foreground">
+                See at a glance which parameters are within range (green), slightly off (orange), or need attention
+                (red).
+              </p>
+            </div>
+          </div>
+
+          <div class="flex gap-6">
+            <div class="flex-shrink-0">
+              <div
+                class="flex items-center justify-center h-12 w-12 rounded-lg bg-blue-600 text-white font-bold text-lg"
+              >
+                4
+              </div>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-foreground mb-2">Receive AI Recommendations</h3>
+              <p class="text-muted-foreground">
+                Click on any parameter with a deviation to receive detailed AI-powered analysis and general corrective
+                suggestions.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex gap-6">
+            <div class="flex-shrink-0">
+              <div
+                class="flex items-center justify-center h-12 w-12 rounded-lg bg-blue-600 text-white font-bold text-lg"
+              >
+                5
+              </div>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-foreground mb-2">Track Trends Over Time</h3>
+              <p class="text-muted-foreground">
+                Use the interactive calendar and historical data to analyze long-term trends and adjust your aquarium
+                maintenance routine.
+              </p>
             </div>
           </div>
         </div>
-      ) : dashboardData ? (
-        <DashboardContent
-          client:load
-          aquariums={dashboardData.aquariums}
-          selectedAquariumId={dashboardData.selectedAquariumId}
-          parameters={dashboardData.parameters}
-          lastMeasurementTime={dashboardData.lastMeasurementTime}
-        />
-      ) : null
-    }
-  </main>
-</Layout>
+      </section>
+
+      <!-- CTA Section -->
+      <section class="max-w-2xl mx-auto text-center py-16 px-6 rounded-2xl bg-primary/5 border border-primary/20">
+        <h2 class="text-3xl font-bold text-foreground mb-4">Ready to Master Your Aquarium?</h2>
+        <p class="text-muted-foreground mb-8 text-lg">
+          Join aquarists who are taking control of their water parameters with ReefMetrics.
+        </p>
+        <a href="/register">
+          <Button size="lg" class="text-base">Create Your Free Account</Button>
+        </a>
+      </section>
+    </main>
+
+    <footer class="border-t border-border bg-background mt-24">
+      <div class="container mx-auto px-4 py-8 text-center text-sm text-muted-foreground">
+        <p>&copy; 2025 ReefMetrics. All rights reserved.</p>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style>
+  html,
+  body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+  }
+</style>

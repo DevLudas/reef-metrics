@@ -1,5 +1,5 @@
 import { useState, useTransition } from "react";
-import { LogOut, User } from "lucide-react";
+import { LogOut, User, Waves } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -73,6 +73,12 @@ export function UserMenu({ userName }: UserMenuProps) {
           <a href="/profile" className="flex cursor-pointer items-center">
             <User className="mr-2 h-4 w-4" />
             <span>Profile</span>
+          </a>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <a href="/aquariums" className="flex cursor-pointer items-center">
+            <Waves className="mr-2 h-4 w-4" />
+            <span>Aquariums</span>
           </a>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
