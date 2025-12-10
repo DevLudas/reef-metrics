@@ -78,7 +78,9 @@ test.describe("Aquarium Creation - Using Fixtures", () => {
    */
   test("should cancel aquarium creation", async ({ aquariumsPage, authenticatedPage }) => {
     // ARRANGE
-    const initialCount = await aquariumsPage.getAquariumCount();
+    const initialResponse = await authenticatedPage.request.get("/api/aquariums");
+    const initialData = (await initialResponse.json()) as { data: { id: string }[] };
+    const initialCount = initialData.data.length;
 
     // ACT
     await aquariumsPage.clickAddAquarium();
@@ -90,8 +92,11 @@ test.describe("Aquarium Creation - Using Fixtures", () => {
     // ASSERT
     await aquariumsPage.formModal.waitForModalHidden();
 
-    // Verify count didn't change
-    const finalCount = await aquariumsPage.getAquariumCount();
+    // Verify count didn't change via API
+    const finalResponse = await authenticatedPage.request.get("/api/aquariums");
+    const finalData = (await finalResponse.json()) as { data: { id: string }[] };
+    const finalCount = finalData.data.length;
+
     expect(finalCount).toBe(initialCount);
   });
 
@@ -105,4 +110,3 @@ test.describe("Aquarium Creation - Using Fixtures", () => {
     });
   });
 });
-

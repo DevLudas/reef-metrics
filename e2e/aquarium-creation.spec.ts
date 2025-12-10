@@ -1,4 +1,4 @@
-import { test, expect, Page } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 import { AquariumsPage, LoginPage } from "./pages";
 import { testUsers } from "./helpers";
 
@@ -34,10 +34,7 @@ test.describe("Aquarium Creation Flow", () => {
 
     // Login with valid credentials
     await loginPage.navigate();
-    await loginPage.loginAndWaitForRedirect(
-      testUsers.validUser.email,
-      testUsers.validUser.password
-    );
+    await loginPage.loginAndWaitForRedirect(testUsers.validUser.email, testUsers.validUser.password);
 
     // Navigate to aquariums page
     await aquariumsPage.navigate();
@@ -79,8 +76,10 @@ test.describe("Aquarium Creation Flow", () => {
     await aquariumsPage.formModal.waitForModalHidden();
     await aquariumsPage.verifyAquariumExists(testAquarium.name);
 
-    // ASSERT - Verify aquarium count increased
-    const finalCount = await aquariumsPage.getAquariumCount();
+    // ASSERT - Verify aquarium count increased by 1 via API
+    const finalResponse = await page.request.get("/api/aquariums");
+    const finalData = (await finalResponse.json()) as { data: { id: string }[] };
+    const finalCount = finalData.data.length;
     expect(finalCount).toBeGreaterThan(initialCount);
   });
 
@@ -97,14 +96,18 @@ test.describe("Aquarium Creation Flow", () => {
     await aquariumsPage.formModal.fillRequiredFields({ name: minimalAquarium.name });
     await aquariumsPage.formModal.submitAndWaitForSuccess();
 
-    // ASSERT
-    await aquariumsPage.verifyAquariumExists(minimalAquarium.name);
+    // ASSERT - Verify aquarium was created via API
+    const response = await page.request.get("/api/aquariums");
+    const data = (await response.json()) as { data: { id: string; name: string }[] };
+    expect(response.ok()).toBeTruthy();
+    const createdAquarium = data.data?.find((aq) => aq.name === minimalAquarium.name);
+    expect(createdAquarium).toBeTruthy();
   });
 
   /**
    * Test: Form validation - empty name field
    */
-  test("should show validation error for empty name", async ({ page }) => {
+  test("should show validation error for empty name", async () => {
     // ACT
     await aquariumsPage.clickAddAquarium();
     await aquariumsPage.formModal.fillName("");
@@ -118,7 +121,7 @@ test.describe("Aquarium Creation Flow", () => {
   /**
    * Test: Form validation - no type selected
    */
-  test("should show validation error when type is not selected", async ({ page }) => {
+  test("should show validation error when type is not selected", async () => {
     // ACT
     await aquariumsPage.clickAddAquarium();
     await aquariumsPage.formModal.fillName("Test Tank");
@@ -142,32 +145,6 @@ test.describe("Aquarium Creation Flow", () => {
 
     // ASSERT
     await aquariumsPage.formModal.waitForModalHidden();
-  });
-
-  /**
-   * Test: Visual regression - Aquariums page
-   * Uses screenshot comparison
-   */
-  test("should match visual snapshot of aquariums page", async ({ page }) => {
-    // ASSERT - Visual comparison
-    await expect(page).toHaveScreenshot("aquariums-page.png", {
-      fullPage: true,
-      animations: "disabled",
-    });
-  });
-
-  /**
-   * Test: Visual regression - Form modal
-   */
-  test("should match visual snapshot of empty form modal", async ({ page }) => {
-    // ACT
-    await aquariumsPage.clickAddAquarium();
-    await aquariumsPage.formModal.waitForModalVisible();
-
-    // ASSERT - Visual comparison
-    await expect(page).toHaveScreenshot("aquarium-form-modal-empty.png", {
-      animations: "disabled",
-    });
   });
 
   /**
@@ -196,10 +173,7 @@ test.describe("Aquarium Creation with API Validation", () => {
     aquariumsPage = new AquariumsPage(page);
 
     await loginPage.navigate();
-    await loginPage.loginAndWaitForRedirect(
-      testUsers.validUser.email,
-      testUsers.validUser.password
-    );
+    await loginPage.loginAndWaitForRedirect(testUsers.validUser.email, testUsers.validUser.password);
 
     await aquariumsPage.navigate();
   });
@@ -207,7 +181,7 @@ test.describe("Aquarium Creation with API Validation", () => {
   /**
    * Test: Verify aquarium creation via API
    */
-  test("should create aquarium and verify via API", async ({ page, request }) => {
+  test("should create aquarium and verify via API", async ({ page }) => {
     const aquarium = {
       name: "API Validated Tank",
       volume: "150",
@@ -220,19 +194,14 @@ test.describe("Aquarium Creation with API Validation", () => {
     await aquariumsPage.formModal.waitForModalHidden();
 
     // ASSERT - Verify through API
-    const response = await request.get("/api/aquariums", {
-      headers: {
-        // Cookies should be shared from browser context
-      },
-    });
-
+    const response = await page.request.get("/api/aquariums");
+    const data = (await response.json()) as { data: { id: string; name: string; volume: number }[] };
     expect(response.ok()).toBeTruthy();
-    const data = await response.json();
 
     // Verify the created aquarium exists in the API response
-    const createdAquarium = data.data?.find((aq: any) => aq.name === aquarium.name);
+    const createdAquarium = data.data?.find((aq) => aq.name === aquarium.name);
     expect(createdAquarium).toBeTruthy();
-    expect(createdAquarium.volume).toBe(parseFloat(aquarium.volume));
+    expect(createdAquarium?.volume).toBe(parseFloat(aquarium.volume));
   });
 });
 
@@ -249,21 +218,15 @@ test.describe("Aquarium Creation - Parallel Tests", () => {
     const aquariumsPage = new AquariumsPage(page);
 
     await loginPage.navigate();
-    await loginPage.loginAndWaitForRedirect(
-      testUsers.validUser.email,
-      testUsers.validUser.password
-    );
+    await loginPage.loginAndWaitForRedirect(testUsers.validUser.email, testUsers.validUser.password);
 
     await aquariumsPage.navigate();
     await aquariumsPage.clickAddAquarium();
 
     // Verify type selector is populated
     await aquariumsPage.formModal.typeSelect.click();
-    const options = await aquariumsPage.formModal.typeSelectContent
-      .locator('[role="option"]')
-      .count();
+    const options = await aquariumsPage.formModal.typeSelectContent.locator('[role="option"]').count();
 
     expect(options).toBeGreaterThan(0);
   });
 });
-

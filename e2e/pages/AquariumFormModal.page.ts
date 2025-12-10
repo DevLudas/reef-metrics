@@ -181,7 +181,7 @@ export class AquariumFormModalPage extends BasePage {
     await this.waitForModalHidden();
     // Account for 500ms delay in AddAquariumButton before reload triggers
     // Then wait for navigation and network activity to complete
-    await new Promise(resolve => setTimeout(resolve, 600));
+    await new Promise((resolve) => setTimeout(resolve, 600));
     // Wait for page to load and any data requests to finish
     await this.page.waitForLoadState("networkidle", { timeout: 10000 });
   }
@@ -225,11 +225,7 @@ export class AquariumFormModalPage extends BasePage {
   /**
    * Verify form fields contain specific values
    */
-  async verifyFormValues(data: {
-    name?: string;
-    volume?: string;
-    description?: string;
-  }): Promise<void> {
+  async verifyFormValues(data: { name?: string; volume?: string; description?: string }): Promise<void> {
     if (data.name !== undefined) {
       await expect(this.nameInput).toHaveValue(data.name);
     }
@@ -253,7 +249,9 @@ export class AquariumFormModalPage extends BasePage {
     };
 
     const fieldLocator = fieldMap[field];
-    const errorLocator = fieldLocator.locator("xpath=following-sibling::p[contains(@class, 'text-destructive')]").first();
+    const errorLocator = fieldLocator
+      .locator("xpath=following-sibling::p[contains(@class, 'text-destructive')]")
+      .first();
 
     if (await errorLocator.isVisible()) {
       return await errorLocator.textContent();

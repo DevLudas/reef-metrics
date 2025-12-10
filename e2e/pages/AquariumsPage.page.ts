@@ -52,6 +52,9 @@ export class AquariumsPage extends BasePage {
    * Open the aquarium creation modal
    */
   async openCreateModal(): Promise<AquariumFormModalPage> {
+    // Ensure button is fully interactive (React hydrated)
+    await this.addAquariumButton.waitFor({ state: "visible" });
+    await this.page.waitForLoadState("networkidle");
     await this.addAquariumButton.click();
     await this.formModal.waitForModalVisible();
     return this.formModal;
@@ -98,7 +101,7 @@ export class AquariumsPage extends BasePage {
       throw new Error(`Failed to fetch aquariums from API: ${response.status()}`);
     }
 
-    const data = await response.json() as { data: Array<{ name: string }> };
+    const data = (await response.json()) as { data: { name: string }[] };
     const aquariumExists = data.data.some((aquarium) => aquarium.name === name);
 
     if (!aquariumExists) {
@@ -122,11 +125,10 @@ export class AquariumsPage extends BasePage {
   /**
    * Take a screenshot of the aquariums page
    */
-  async takeScreenshot(name: string = "aquariums-page"): Promise<void> {
+  async takeScreenshot(name = "aquariums-page"): Promise<void> {
     await expect(this.page).toHaveScreenshot(`${name}.png`, {
       fullPage: true,
       animations: "disabled",
     });
   }
 }
-

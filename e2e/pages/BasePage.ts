@@ -79,4 +79,3 @@ export abstract class BasePage {
     await this.page.waitForURL(pattern, { timeout: timeout ?? 10000 });
   }
 }
-

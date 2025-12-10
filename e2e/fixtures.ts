@@ -8,11 +8,11 @@ import { testUsers } from "./helpers";
  * Uses real API endpoints with data from migrated database
  */
 
-type CustomFixtures = {
+interface CustomFixtures {
   authenticatedPage: Page;
   aquariumsPage: AquariumsPage;
   loginPage: LoginPage;
-};
+}
 
 /**
  * Extended test with custom fixtures
@@ -23,14 +23,12 @@ export const test = base.extend<CustomFixtures>({
    * Fixture: Authenticated page
    * Provides a page that is already logged in
    */
+
   authenticatedPage: async ({ page }, use) => {
     const loginPage = new LoginPage(page);
 
     await loginPage.navigate();
-    await loginPage.loginAndWaitForRedirect(
-      testUsers.validUser.email,
-      testUsers.validUser.password
-    );
+    await loginPage.loginAndWaitForRedirect(testUsers.validUser.email, testUsers.validUser.password);
 
     await use(page);
   },
@@ -40,8 +38,8 @@ export const test = base.extend<CustomFixtures>({
    * Provides AquariumsPage object already navigated and authenticated
    * Uses real API endpoints with seeded test data
    */
-  aquariumsPage: async ({ authenticatedPage }, use) => {
 
+  aquariumsPage: async ({ authenticatedPage }, use) => {
     const aquariumsPage = new AquariumsPage(authenticatedPage);
     await aquariumsPage.navigate();
     await aquariumsPage.verifyPageLoaded();
@@ -53,6 +51,7 @@ export const test = base.extend<CustomFixtures>({
    * Fixture: Login page
    * Provides LoginPage object
    */
+
   loginPage: async ({ page }, use) => {
     const loginPage = new LoginPage(page);
     await use(loginPage);
@@ -60,4 +59,3 @@ export const test = base.extend<CustomFixtures>({
 });
 
 export { expect } from "@playwright/test";
-

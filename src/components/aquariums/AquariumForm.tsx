@@ -78,7 +78,14 @@ export function AquariumForm({ onSubmit, initialData, isSubmitting = false }: Aq
         <Label htmlFor="name" className="text-sm font-medium">
           Name <span className="text-destructive">*</span>
         </Label>
-        <Input id="name" {...register("name")} placeholder="My Reef Tank" disabled={isSubmitting} className="w-full" data-testid="aquarium-name-input" />
+        <Input
+          id="name"
+          {...register("name")}
+          placeholder="My Reef Tank"
+          disabled={isSubmitting}
+          className="w-full"
+          data-testid="aquarium-name-input"
+        />
         {errors.name && (
           <p className="text-sm text-destructive flex items-center gap-1">
             <svg className="h-4 w-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -193,7 +200,12 @@ export function AquariumForm({ onSubmit, initialData, isSubmitting = false }: Aq
 
       {/* Form Actions */}
       <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-4 border-t">
-        <Button type="submit" disabled={isSubmitting} className="w-full sm:w-auto gap-2" data-testid="save-aquarium-button">
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full sm:w-auto gap-2"
+          data-testid="save-aquarium-button"
+        >
           {isSubmitting && (
             <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
