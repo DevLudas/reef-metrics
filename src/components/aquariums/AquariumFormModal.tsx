@@ -57,6 +57,7 @@ export function AquariumFormModal({ isOpen, setIsOpen, aquariumToEdit, onSuccess
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent
         className="w-[calc(100%-2rem)] max-w-2xl"
+        data-testid="aquarium-form-modal"
         onInteractOutside={(e) => {
           if (isSubmitting) {
             e.preventDefault();
