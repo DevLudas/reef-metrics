@@ -167,8 +167,8 @@ export const GET: APIRoute = async ({ params, url, locals }) => {
       }),
       { status: 404, headers: { "Content-Type": "application/json" } }
     );
-  } catch (error: any) {
-    if (error.message === "NOT_FOUND") {
+  } catch (error: unknown) {
+    if (error instanceof Error && error.message === "NOT_FOUND") {
       return new Response(
         JSON.stringify({
           error: { code: "NOT_FOUND", message: "Aquarium not found or access denied" },
@@ -281,8 +281,8 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
       }),
       { status: 404, headers: { "Content-Type": "application/json" } }
     );
-  } catch (error: any) {
-    if (error.message === "NOT_FOUND") {
+  } catch (error: unknown) {
+    if (error instanceof Error && error.message === "NOT_FOUND") {
       return new Response(
         JSON.stringify({
           error: { code: "NOT_FOUND", message: "Aquarium not found or access denied" },

@@ -57,7 +57,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       }
     );
   } catch (error) {
-    console.error("Login error:", error);
+    // console.error("Login error:", error);
 
     // Return user-friendly error messages
     const errorMessage = error instanceof Error ? error.message : "Failed to login";

@@ -18,13 +18,6 @@ const PUBLIC_PATHS = [
   "/api/auth/reset-password",
 ];
 
-// Protected paths - require authentication
-const PROTECTED_PATHS = [
-  "/dashboard",
-  "/aquariums",
-  "/profile",
-];
-
 export const onRequest = defineMiddleware(async (context, next) => {
   // Set the basic supabase client for non-auth operations
   context.locals.supabase = supabaseClient;

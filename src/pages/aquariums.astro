@@ -17,12 +17,7 @@ const aquariumService = new AquariumService(Astro.locals.supabase);
 let aquariums: AquariumListItemDTO[] = [];
 let error: string | null = null;
 
-try {
-  aquariums = await aquariumService.listAquariums(user.id);
-} catch (e) {
-  console.error("Failed to fetch aquariums:", e);
-  error = "Failed to load aquariums. Please try again.";
-}
+aquariums = await aquariumService.listAquariums(user.id);
 ---
 
 <Layout title="My Aquariums">

@@ -57,7 +57,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       }
     );
   } catch (error) {
-    console.error("Register error:", error);
+    // console.error("Register error:", error);
 
     // Return user-friendly error messages
     const errorMessage = error instanceof Error ? error.message : "Failed to register";
@@ -76,4 +76,3 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     );
   }
 };
-

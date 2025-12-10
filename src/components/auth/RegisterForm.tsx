@@ -65,7 +65,6 @@ export function RegisterForm() {
         </div>
       )}
 
-
       {/* Email Field */}
       <div className="space-y-2">
         <Label htmlFor="email" className="text-sm font-medium">
