@@ -14,37 +14,37 @@ const createMockChain = (returnValue: unknown = null, returnError: unknown = nul
     count: Array.isArray(returnValue) ? returnValue.length : 0,
   };
 
-  const chain = {
-    select: vi.fn(function () {
+  const chain: Record<string, any> = {
+    select: vi.fn(function (this: Record<string, any>) {
       return this;
     }),
-    eq: vi.fn(function () {
+    eq: vi.fn(function (this: Record<string, any>) {
       return this;
     }),
-    insert: vi.fn(function () {
+    insert: vi.fn(function (this: Record<string, any>) {
       return this;
     }),
-    update: vi.fn(function () {
+    update: vi.fn(function (this: Record<string, any>) {
       return this;
     }),
     single: vi.fn().mockResolvedValue({ data: returnValue, error: returnError }),
-    order: vi.fn(function () {
+    order: vi.fn(function (this: Record<string, any>) {
       return this;
     }),
-    range: vi.fn(function () {
+    range: vi.fn(function (this: Record<string, any>) {
       return this;
     }),
-    gte: vi.fn(function () {
+    gte: vi.fn(function (this: Record<string, any>) {
       return this;
     }),
-    lte: vi.fn(function () {
+    lte: vi.fn(function (this: Record<string, any>) {
       return this;
     }),
-    lt: vi.fn(function () {
+    lt: vi.fn(function (this: Record<string, any>) {
       return this;
     }),
     // Support await on the chain itself (Supabase pattern)
-    then: vi.fn((resolve) => {
+    then: vi.fn((resolve: (value: any) => void) => {
       resolve(resolvedValue);
     }),
   };
@@ -53,13 +53,13 @@ const createMockChain = (returnValue: unknown = null, returnError: unknown = nul
 
 describe("AquariumService", () => {
   let service: AquariumService;
-  let mockSupabase: Record<string, unknown>;
+  let mockSupabase: Record<string, any>;
 
   beforeEach(() => {
     mockSupabase = {
       from: vi.fn(),
     };
-    service = new AquariumService(mockSupabase as Record<string, unknown> as SupabaseClient);
+    service = new AquariumService(mockSupabase as unknown as SupabaseClient);
   });
 
   // ============================================================================

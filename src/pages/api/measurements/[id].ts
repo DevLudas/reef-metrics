@@ -84,11 +84,11 @@ export const PATCH: APIRoute = async ({ params, request, locals }) => {
       );
     }
 
-    const userId = DEFAULT_USER_ID;
-    if (!userId) {
+    const user = locals.user;
+    if (!user) {
       return new Response(
         JSON.stringify({
-          error: { code: "UNAUTHORIZED", message: "Invalid authentication" },
+          error: { code: "UNAUTHORIZED", message: "User not authenticated" },
         }),
         { status: 401, headers: { "Content-Type": "application/json" } }
       );
@@ -123,7 +123,7 @@ export const PATCH: APIRoute = async ({ params, request, locals }) => {
       );
     }
 
-    const measurement = await measurementsService.updateMeasurement(userId, measurementId, validation.data);
+    const measurement = await measurementsService.updateMeasurement(user.id, measurementId, validation.data);
 
     return new Response(JSON.stringify({ data: measurement }), {
       status: 200,

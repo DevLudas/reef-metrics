@@ -61,7 +61,7 @@ export interface ModelParameters {
 export interface ChatCompletionOptions<T> {
   systemMessage: string;
   userMessage: string;
-  responseFormat: ResponseFormat<T>;
+  responseFormat: ResponseFormat;
   model?: string;
   modelParams?: ModelParameters;
 }
@@ -87,7 +87,7 @@ interface OpenRouterRequestPayload {
     role: "system" | "user" | "assistant";
     content: string;
   }[];
-  response_format?: ResponseFormat<unknown>;
+  response_format?: ResponseFormat;
   temperature?: number;
   max_tokens?: number;
   top_p?: number;
@@ -244,7 +244,7 @@ export class OpenRouterService {
           content: options.userMessage,
         },
       ],
-      response_format: options.responseFormat as ResponseFormat<unknown>,
+      response_format: options.responseFormat as ResponseFormat,
       ...params,
     };
   }

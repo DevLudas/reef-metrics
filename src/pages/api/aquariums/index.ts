@@ -119,6 +119,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     // Log unexpected errors and return 500
-    return errorResponse("INTERNAL_SERVER_ERROR", "An unexpected error occurred: " + error.message, 500);
+    const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred";
+    return errorResponse("INTERNAL_SERVER_ERROR", `An unexpected error occurred: ${errorMessage}`, 500);
   }
 };
