@@ -25,6 +25,7 @@ const baseConfig = tseslint.config({
 
 const jsxA11yConfig = tseslint.config({
   files: ["**/*.{js,jsx,ts,tsx}"],
+  ignores: ["e2e/**/*"],
   extends: [jsxA11y.flatConfigs.recommended],
   languageOptions: {
     ...jsxA11y.flatConfigs.recommended.languageOptions,
@@ -36,6 +37,7 @@ const jsxA11yConfig = tseslint.config({
 
 const reactConfig = tseslint.config({
   files: ["**/*.{js,jsx,ts,tsx}"],
+  ignores: ["e2e/**/*"],
   extends: [pluginReact.configs.flat.recommended],
   languageOptions: {
     ...pluginReact.configs.flat.recommended.languageOptions,

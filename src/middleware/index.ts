@@ -43,8 +43,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
       email: user.email ?? "",
       id: user.id,
     };
+    // Use the server client for authenticated operations to enable RLS
+    context.locals.supabase = supabase;
   } else if (!PUBLIC_PATHS.includes(context.url.pathname)) {
-    // Redirect to login for protected routes
     return context.redirect("/login");
   }
 

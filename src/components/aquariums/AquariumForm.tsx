@@ -72,13 +72,20 @@ export function AquariumForm({ onSubmit, initialData, isSubmitting = false }: Aq
   };
 
   return (
-    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-5">
+    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-5" data-testid="aquarium-form">
       {/* Name Field */}
       <div className="space-y-2">
         <Label htmlFor="name" className="text-sm font-medium">
           Name <span className="text-destructive">*</span>
         </Label>
-        <Input id="name" {...register("name")} placeholder="My Reef Tank" disabled={isSubmitting} className="w-full" />
+        <Input
+          id="name"
+          {...register("name")}
+          placeholder="My Reef Tank"
+          disabled={isSubmitting}
+          className="w-full"
+          data-testid="aquarium-name-input"
+        />
         {errors.name && (
           <p className="text-sm text-destructive flex items-center gap-1">
             <svg className="h-4 w-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -103,10 +110,10 @@ export function AquariumForm({ onSubmit, initialData, isSubmitting = false }: Aq
           onValueChange={(value) => setValue("aquarium_type_id", value)}
           disabled={isSubmitting || isLoadingTypes}
         >
-          <SelectTrigger id="aquarium_type_id" className="w-full">
+          <SelectTrigger id="aquarium_type_id" className="w-full" data-testid="aquarium-type-select">
             <SelectValue placeholder={isLoadingTypes ? "Loading types..." : "Select an aquarium type"} />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent data-testid="aquarium-type-select-content">
             {aquariumTypes.map((type) => (
               <SelectItem key={type.id} value={type.id}>
                 <div className="flex flex-col">
@@ -145,6 +152,7 @@ export function AquariumForm({ onSubmit, initialData, isSubmitting = false }: Aq
             placeholder="100"
             disabled={isSubmitting}
             className="w-full pr-8"
+            data-testid="aquarium-volume-input"
           />
           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">L</span>
         </div>
@@ -174,6 +182,7 @@ export function AquariumForm({ onSubmit, initialData, isSubmitting = false }: Aq
           disabled={isSubmitting}
           rows={3}
           className="w-full resize-y"
+          data-testid="aquarium-description-input"
         />
         {errors.description && (
           <p className="text-sm text-destructive flex items-center gap-1">
@@ -191,7 +200,12 @@ export function AquariumForm({ onSubmit, initialData, isSubmitting = false }: Aq
 
       {/* Form Actions */}
       <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-4 border-t">
-        <Button type="submit" disabled={isSubmitting} className="w-full sm:w-auto gap-2">
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full sm:w-auto gap-2"
+          data-testid="save-aquarium-button"
+        >
           {isSubmitting && (
             <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />

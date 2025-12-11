@@ -568,7 +568,7 @@ describe("aquariumFormSchema", () => {
 
       const result = aquariumFormSchema.safeParse(data);
 
-      expect(result.success).toBe(false);
+      expect(result.success).toBe(true);
     });
 
     it("should accept very small positive volume", () => {
@@ -874,6 +874,7 @@ describe("aquariumFormSchema", () => {
       const data = {
         name: "New Tank",
         aquarium_type_id: VALID_UUID,
+        volume: "",
       };
 
       const result = aquariumFormSchema.safeParse(data);

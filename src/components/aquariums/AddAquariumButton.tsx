@@ -12,7 +12,7 @@ export function AddAquariumButton() {
 
   return (
     <>
-      <Button onClick={() => setIsModalOpen(true)} className="w-full sm:w-auto">
+      <Button onClick={() => setIsModalOpen(true)} className="w-full sm:w-auto" data-testid="add-new-aquarium-button">
         <svg
           className="mr-2 h-4 w-4"
           fill="none"
