@@ -27,7 +27,7 @@ export function AquariumForm({ onSubmit, initialData, isSubmitting = false }: Aq
     setValue,
     watch,
     reset,
-  } = useForm<AquariumFormData>({
+  } = useForm({
     resolver: zodResolver(aquariumFormSchema),
     defaultValues: {
       name: initialData?.name || "",
@@ -68,7 +68,7 @@ export function AquariumForm({ onSubmit, initialData, isSubmitting = false }: Aq
   }, []);
 
   const handleFormSubmit = async (data: AquariumFormData) => {
-    await onSubmit(data);
+    await onSubmit(data as CreateAquariumCommand);
   };
 
   return (

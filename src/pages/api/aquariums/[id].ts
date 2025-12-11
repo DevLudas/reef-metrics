@@ -2,7 +2,7 @@ import type { APIRoute } from "astro";
 import { z } from "zod";
 import { AquariumService } from "@/lib/services/aquarium.service";
 import { errorResponse } from "@/lib/utils";
-import type { UpdateAquariumCommand, AquariumResponseDTO, UpdateAquariumResponseDTO } from "@/types";
+import type { UpdateAquariumCommand, AquariumResponseDTO, UpdateAquariumResponseDTO, ErrorResponseDTO } from "@/types";
 
 export const prerender = false;
 

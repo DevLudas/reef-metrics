@@ -1,4 +1,4 @@
-import { Page } from "@playwright/test";
+import { type Page } from "@playwright/test";
 
 /**
  * Test user fixtures for authentication tests
@@ -97,8 +97,8 @@ export async function createAquarium(
 export async function waitForApiResponse(page: Page, method: string, urlPattern: string | RegExp) {
   return page.waitForResponse((response) => {
     const matches =
-      typeof urlPattern === "string" ? response.url().includes(urlPattern) : response.url().match(urlPattern);
-    return matches && response.request().method() === method;
+      typeof urlPattern === "string" ? response.url().includes(urlPattern) : response.url().match(urlPattern) !== null;
+    return Boolean(matches) && response.request().method() === method;
   });
 }
 

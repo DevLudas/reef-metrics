@@ -20,7 +20,7 @@ export function AquariumCard({ aquarium, onAquariumDeleted }: AquariumCardProps)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const { toast } = useToast();
+  const { success, error } = useToast();
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -33,18 +33,11 @@ export function AquariumCard({ aquarium, onAquariumDeleted }: AquariumCardProps)
         throw new Error("Failed to delete aquarium");
       }
 
-      toast({
-        title: "Aquarium deleted",
-        description: `${aquarium.name} has been deleted successfully.`,
-      });
+      success("Aquarium deleted", `${aquarium.name} has been deleted successfully.`);
 
       onAquariumDeleted(aquarium.id);
     } catch {
-      toast({
-        title: "Error",
-        description: "Failed to delete aquarium. Please try again.",
-        variant: "destructive",
-      });
+      error("Error", "Failed to delete aquarium. Please try again.");
     } finally {
       setIsDeleting(false);
       setIsDeleteDialogOpen(false);
@@ -204,7 +197,12 @@ export function AquariumCard({ aquarium, onAquariumDeleted }: AquariumCardProps)
         </div>
       </div>
 
-      <AquariumFormModal isOpen={isEditModalOpen} setIsOpen={setIsEditModalOpen} aquariumToEdit={aquariumForEdit} />
+      <AquariumFormModal
+        isOpen={isEditModalOpen}
+        setIsOpen={setIsEditModalOpen}
+        aquariumToEdit={aquariumForEdit}
+        onSuccess={() => setIsEditModalOpen(false)}
+      />
 
       <DeleteConfirmationDialog
         isOpen={isDeleteDialogOpen}

@@ -169,7 +169,9 @@ export async function POST(context: APIContext): Promise<Response> {
       requestBody.optimal_max
     );
 
-    const status = deviationStatus.status;
+    // Map internal status to API response status, defaulting to normal if no_data
+    const apiStatus = deviationStatus.status === "no_data" ? "normal" : deviationStatus.status;
+    const deviationPercentage = deviationStatus.deviationPercentage ?? 0;
 
     // Step 11: Generate AI recommendations (only if not normal)
     let analysis = "";
@@ -191,8 +193,8 @@ export async function POST(context: APIContext): Promise<Response> {
           currentValue: requestBody.current_value,
           optimalMin: requestBody.optimal_min,
           optimalMax: requestBody.optimal_max,
-          deviationPercentage: deviationStatus.deviationPercentage,
-          status: status as "warning" | "critical",
+          deviationPercentage: deviationPercentage,
+          status: apiStatus as "warning" | "critical",
         };
 
         const aiResponse = await generateRecommendations(aiContext);
@@ -203,11 +205,12 @@ export async function POST(context: APIContext): Promise<Response> {
         // eslint-disable-next-line no-console
         console.error("AI service error:", error);
 
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
         const errorResponse: ErrorResponseDTO = {
           error: {
             code: "AI_SERVICE_UNAVAILABLE",
             message:
-              "AI recommendation service is temporarily unavailable [" + error.message + "]. Please try again later.",
+              "AI recommendation service is temporarily unavailable [" + errorMessage + "]. Please try again later.",
           },
         };
         return new Response(JSON.stringify(errorResponse), {
@@ -235,8 +238,8 @@ export async function POST(context: APIContext): Promise<Response> {
           min: requestBody.optimal_min,
           max: requestBody.optimal_max,
         },
-        deviation_percentage: deviationStatus.deviationPercentage,
-        status,
+        deviation_percentage: deviationPercentage,
+        status: apiStatus,
         analysis,
         recommendations,
         disclaimer: AI_DISCLAIMER,

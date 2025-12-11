@@ -13,8 +13,8 @@ export function useAquariums(initialAquariums: AquariumListItemDTO[]) {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await dashboardAPI().getAquariums();
-      setAquariums(data.aquariums);
+      const response = await dashboardAPI().getAquariums();
+      setAquariums(response.data);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to fetch aquariums";
       setError(errorMessage);

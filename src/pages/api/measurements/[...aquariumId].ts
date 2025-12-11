@@ -58,7 +58,7 @@ export const GET: APIRoute = async ({ params, url, locals }) => {
     }
 
     const measurementsService = new MeasurementsService(supabaseClient);
-    const pathSegments = params.aquariumId.split("/");
+    const pathSegments = (params.aquariumId ?? "").split("/");
     const aquariumId = pathSegments[0];
 
     if (!aquariumId) {
@@ -123,7 +123,7 @@ export const GET: APIRoute = async ({ params, url, locals }) => {
 
     if (subPath === "latest") {
       // GET /api/measurements/:aquariumId/latest
-      const measurements = await measurementsService.getLatestMeasurements(userId, aquariumId);
+      const measurements = await measurementsService.getLatestMeasurements(user.id, aquariumId);
 
       return new Response(JSON.stringify({ data: measurements }), {
         status: 200,
@@ -143,7 +143,7 @@ export const GET: APIRoute = async ({ params, url, locals }) => {
         );
       }
 
-      const measurements = await measurementsService.getMeasurementsByDate(userId, aquariumId, date);
+      const measurements = await measurementsService.getMeasurementsByDate(user.id, aquariumId, date);
 
       return new Response(JSON.stringify({ data: measurements }), {
         status: 200,
@@ -153,7 +153,7 @@ export const GET: APIRoute = async ({ params, url, locals }) => {
 
     if (subPath === "calendar") {
       // GET /api/measurements/:aquariumId/calendar
-      const calendar = await measurementsService.getMeasurementCalendar(userId, aquariumId);
+      const calendar = await measurementsService.getMeasurementCalendar(user.id, aquariumId);
 
       return new Response(JSON.stringify({ data: calendar }), {
         status: 200,
@@ -198,18 +198,18 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
       );
     }
 
-    const userId = DEFAULT_USER_ID;
-    if (!userId) {
+    const user = locals.user;
+    if (!user) {
       return new Response(
         JSON.stringify({
-          error: { code: "UNAUTHORIZED", message: "Invalid authentication" },
+          error: { code: "UNAUTHORIZED", message: "User not authenticated" },
         }),
         { status: 401, headers: { "Content-Type": "application/json" } }
       );
     }
 
     const measurementsService = new MeasurementsService(supabaseClient);
-    const pathSegments = params.aquariumId.split("/");
+    const pathSegments = (params.aquariumId ?? "").split("/");
     const aquariumId = pathSegments[0];
 
     if (!aquariumId) {
@@ -241,7 +241,7 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
         );
       }
 
-      const measurement = await measurementsService.createMeasurement(userId, aquariumId, validation.data);
+      const measurement = await measurementsService.createMeasurement(user.id, aquariumId, validation.data);
 
       return new Response(JSON.stringify({ data: measurement }), {
         status: 201,
@@ -267,7 +267,7 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
         );
       }
 
-      const measurements = await measurementsService.bulkCreateMeasurements(userId, aquariumId, validation.data);
+      const measurements = await measurementsService.bulkCreateMeasurements(user.id, aquariumId, validation.data);
 
       return new Response(JSON.stringify({ data: measurements }), {
         status: 201,

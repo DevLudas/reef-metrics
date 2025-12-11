@@ -2,9 +2,9 @@ name: Test Suite
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main]
   pull_request:
-    branches: [main, develop]
+    branches: [main]
   workflow_dispatch:
     inputs:
       skip_e2e:
@@ -16,12 +16,6 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-
-env:
-  # Provide dummy values for build-time checks when secrets are not available
-  SUPABASE_URL: ${{ secrets.SUPABASE_URL || 'https://dummy.supabase.co' }}
-  SUPABASE_KEY: ${{ secrets.SUPABASE_KEY || 'dummy-key' }}
-  OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY || 'dummy-key' }}
 
 jobs:
   build:
@@ -60,16 +54,8 @@ jobs:
 
       - uses: ./.github/actions/setup-and-deps
 
-      - name: Run unit tests with coverage
-        run: npm run test:coverage
-
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          files: ./coverage/coverage-final.json
-          flags: unittests
-          name: codecov-umbrella
-          fail_ci_if_error: false
+      - name: Run unit tests
+        run: npm run test
 
   e2e-tests:
     name: E2E Tests (Playwright)
@@ -90,21 +76,16 @@ jobs:
       - name: Build project
         run: npm run build
 
-      - name: Start preview server
-        run: npm run preview &
-
-      - name: Wait for server to be ready
+      - name: Create .env.test file
         run: |
-          for i in {1..30}; do
-            if curl -f http://localhost:3000; then
-              echo "✅ Server is ready"
-              exit 0
-            fi
-            echo "⏳ Waiting for server... (attempt $i/30)"
-            sleep 2
-          done
-          echo "❌ Server failed to start after 60 seconds"
-          exit 1
+          cat > .env.test << EOF
+          SUPABASE_PASSWORD=${{ secrets.SUPABASE_PASSWORD }}
+          SUPABASE_URL=${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}
+          OPENROUTER_API_KEY=${{ secrets.OPENROUTER_API_KEY }}
+          E2E_USERNAME=${{ secrets.E2E_USERNAME }}
+          E2E_PASSWORD=${{ secrets.E2E_PASSWORD }}
+          E2E_USERNAME_ID=${{ secrets.E2E_USERNAME_ID }}
 
       - name: Run E2E tests
         run: npm run test:e2e

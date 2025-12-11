@@ -21,10 +21,12 @@ export default defineConfig(
           "src/layouts/**",
           "e2e/",
         ],
-        lines: 70,
-        functions: 70,
-        branches: 70,
-        statements: 70,
+        thresholds: {
+          lines: 70,
+          functions: 70,
+          branches: 70,
+          statements: 70,
+        },
       },
     },
   })

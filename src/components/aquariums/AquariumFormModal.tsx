@@ -13,7 +13,7 @@ interface AquariumFormModalProps {
 
 export function AquariumFormModal({ isOpen, setIsOpen, aquariumToEdit, onSuccess }: AquariumFormModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
+  const { success, error } = useToast();
 
   const handleSubmit = async (data: CreateAquariumCommand) => {
     setIsSubmitting(true);
@@ -35,18 +35,14 @@ export function AquariumFormModal({ isOpen, setIsOpen, aquariumToEdit, onSuccess
         throw new Error(errorData.error?.message || "Failed to save aquarium");
       }
 
-      toast({
-        title: isEditing ? "Aquarium updated" : "Aquarium created",
-        description: `${data.name} has been ${isEditing ? "updated" : "created"} successfully.`,
-      });
+      success(
+        isEditing ? "Aquarium updated" : "Aquarium created",
+        `${data.name} has been ${isEditing ? "updated" : "created"} successfully.`
+      );
 
       onSuccess?.();
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to save aquarium",
-        variant: "destructive",
-      });
+    } catch (err) {
+      error("Error", err instanceof Error ? err.message : "Failed to save aquarium");
     } finally {
       setIsSubmitting(false);
       setIsOpen(false);

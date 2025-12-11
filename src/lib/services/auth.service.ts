@@ -104,10 +104,6 @@ export class AuthService {
    */
   async signOut(): Promise<void> {
     await this.supabase.auth.signOut();
-
-    if (error) {
-      throw new Error(`Failed to sign out: ${error.message}`);
-    }
   }
 }
 
