@@ -58,7 +58,7 @@ export interface ModelParameters {
 /**
  * Options for creating a chat completion
  */
-export interface ChatCompletionOptions<T> {
+export interface ChatCompletionOptions {
   systemMessage: string;
   userMessage: string;
   responseFormat: ResponseFormat;
@@ -145,7 +145,7 @@ export class OpenRouterService {
    * @returns Parsed and typed response matching the provided schema
    * @throws OpenRouterError or its subclasses on failure
    */
-  async createChatCompletion<T>(options: ChatCompletionOptions<T>): Promise<T> {
+  async createChatCompletion<T>(options: ChatCompletionOptions): Promise<T> {
     this.log("info", "Creating chat completion", {
       model: options.model || this.defaultModel,
       hasSystemMessage: !!options.systemMessage,
@@ -200,7 +200,7 @@ export class OpenRouterService {
    * @returns Formatted request payload
    * @throws OpenRouterValidationError if parameters are out of range
    */
-  private buildRequestPayload<T>(options: ChatCompletionOptions<T>): OpenRouterRequestPayload {
+  private buildRequestPayload(options: ChatCompletionOptions): OpenRouterRequestPayload {
     const model = options.model || this.defaultModel;
 
     const params = {

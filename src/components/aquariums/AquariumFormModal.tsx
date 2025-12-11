@@ -42,10 +42,7 @@ export function AquariumFormModal({ isOpen, setIsOpen, aquariumToEdit, onSuccess
 
       onSuccess?.();
     } catch (err) {
-      error(
-        "Error",
-        err instanceof Error ? err.message : "Failed to save aquarium"
-      );
+      error("Error", err instanceof Error ? err.message : "Failed to save aquarium");
     } finally {
       setIsSubmitting(false);
       setIsOpen(false);

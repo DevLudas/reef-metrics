@@ -4,56 +4,77 @@ import type { CreateAquariumCommand, UpdateAquariumCommand } from "@/types";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 /**
+ * Type for mock query builder chain
+ */
+interface MockChain {
+  select: ReturnType<typeof vi.fn>;
+  eq: ReturnType<typeof vi.fn>;
+  insert: ReturnType<typeof vi.fn>;
+  update: ReturnType<typeof vi.fn>;
+  single: ReturnType<typeof vi.fn>;
+  order: ReturnType<typeof vi.fn>;
+  range: ReturnType<typeof vi.fn>;
+  gte: ReturnType<typeof vi.fn>;
+  lte: ReturnType<typeof vi.fn>;
+  lt: ReturnType<typeof vi.fn>;
+  then: ReturnType<typeof vi.fn>;
+}
+
+/**
  * Create a chainable mock for Supabase query builders that supports both
  * direct awaiting and method chaining
  */
-const createMockChain = (returnValue: unknown = null, returnError: unknown = null) => {
+const createMockChain = (returnValue: unknown = null, returnError: unknown = null): MockChain => {
   const resolvedValue = {
     data: returnValue,
     error: returnError,
     count: Array.isArray(returnValue) ? returnValue.length : 0,
   };
 
-  const chain: Record<string, any> = {
-    select: vi.fn(function (this: Record<string, any>) {
+  const chain: MockChain = {
+    select: vi.fn(function (this: MockChain) {
       return this;
     }),
-    eq: vi.fn(function (this: Record<string, any>) {
+    eq: vi.fn(function (this: MockChain) {
       return this;
     }),
-    insert: vi.fn(function (this: Record<string, any>) {
+    insert: vi.fn(function (this: MockChain) {
       return this;
     }),
-    update: vi.fn(function (this: Record<string, any>) {
+    update: vi.fn(function (this: MockChain) {
       return this;
     }),
     single: vi.fn().mockResolvedValue({ data: returnValue, error: returnError }),
-    order: vi.fn(function (this: Record<string, any>) {
+    order: vi.fn(function (this: MockChain) {
       return this;
     }),
-    range: vi.fn(function (this: Record<string, any>) {
+    range: vi.fn(function (this: MockChain) {
       return this;
     }),
-    gte: vi.fn(function (this: Record<string, any>) {
+    gte: vi.fn(function (this: MockChain) {
       return this;
     }),
-    lte: vi.fn(function (this: Record<string, any>) {
+    lte: vi.fn(function (this: MockChain) {
       return this;
     }),
-    lt: vi.fn(function (this: Record<string, any>) {
+    lt: vi.fn(function (this: MockChain) {
       return this;
     }),
     // Support await on the chain itself (Supabase pattern)
-    then: vi.fn((resolve: (value: any) => void) => {
+    then: vi.fn((resolve: (value: unknown) => void) => {
       resolve(resolvedValue);
     }),
   };
   return chain;
 };
 
+interface MockSupabase {
+  from: ReturnType<typeof vi.fn>;
+}
+
 describe("AquariumService", () => {
   let service: AquariumService;
-  let mockSupabase: Record<string, any>;
+  let mockSupabase: MockSupabase;
 
   beforeEach(() => {
     mockSupabase = {

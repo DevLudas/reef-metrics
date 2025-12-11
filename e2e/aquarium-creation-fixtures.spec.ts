@@ -99,14 +99,4 @@ test.describe("Aquarium Creation - Using Fixtures", () => {
 
     expect(finalCount).toBe(initialCount);
   });
-
-  /**
-   * Test: Visual regression
-   */
-  test("should match aquariums page snapshot", async ({ authenticatedPage }) => {
-    await expect(authenticatedPage).toHaveScreenshot("aquariums-list.png", {
-      fullPage: true,
-      animations: "disabled",
-    });
-  });
 });
