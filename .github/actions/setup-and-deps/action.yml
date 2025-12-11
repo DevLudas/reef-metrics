@@ -1,0 +1,29 @@
+name: Setup Node and Dependencies
+description: Setup Node.js, cache dependencies, and install packages
+
+inputs:
+  node-version:
+    description: Node.js version to use
+    required: false
+    default: '22.14.0'
+
+outputs:
+  node-version:
+    description: The Node.js version used
+    value: ${{ steps.setup.outputs.node-version }}
+
+runs:
+  using: composite
+
+  steps:
+    - name: Setup Node.js ${{ inputs.node-version }}
+      id: setup
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: npm
+
+    - name: Install dependencies
+      shell: bash
+      run: npm ci
+
