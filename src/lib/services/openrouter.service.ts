@@ -348,11 +348,42 @@ export class OpenRouterService {
       throw new OpenRouterTokenLimitError("Response truncated due to token limit", response.usage?.total_tokens);
     }
 
+    // Log content for debugging
+    this.log("info", "Attempting to parse response content", {
+      contentPreview: content.substring(0, 200),
+      contentLength: content.length,
+    });
+
     // Parse JSON
     try {
-      const parsed = JSON.parse(content) as T;
-      return parsed;
+      return JSON.parse(content) as T;
     } catch (error) {
+      // If JSON parsing fails, try to extract JSON from markdown code blocks
+      const jsonMatch = content.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+      if (jsonMatch) {
+        try {
+          return JSON.parse(jsonMatch[1]) as T;
+        } catch {
+          // Continue to fallback parsing
+        }
+      }
+
+      // Try to find JSON object in the content (in case there's extra text)
+      const jsonObjectMatch = content.match(/\{[\s\S]*\}/);
+      if (jsonObjectMatch) {
+        try {
+          return JSON.parse(jsonObjectMatch[0]) as T;
+        } catch {
+          // Continue to fallback parsing
+        }
+      }
+
+      // If still no JSON, log a warning and throw
+      this.log("error", "Failed to parse response as JSON", {
+        content: content.substring(0, 500), // Log first 500 chars
+        error,
+      });
+
       throw new OpenRouterParseError("Failed to parse response JSON", {
         content,
         error,

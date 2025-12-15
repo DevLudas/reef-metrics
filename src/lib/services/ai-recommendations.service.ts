@@ -61,7 +61,19 @@ Then provide 3-5 specific, actionable recommendations to correct this issue. Eac
 - Actionable (something the user can do)
 - Ordered by priority (most important first)
 
-Focus on immediate actions, testing procedures, and long-term prevention strategies.`;
+Focus on immediate actions, testing procedures, and long-term prevention strategies.
+
+IMPORTANT: You must respond with ONLY a valid JSON object in this exact format:
+{
+  "analysis": "Your 2-3 sentence analysis here",
+  "recommendations": [
+    "First recommendation",
+    "Second recommendation",
+    "Third recommendation"
+  ]
+}
+
+Do not include any markdown formatting, code blocks, or additional text. Return only the raw JSON object.`;
 }
 
 /**
@@ -109,11 +121,15 @@ export async function generateRecommendations(context: AIRecommendationContext):
     "Your advice is practical, safe, and based on established aquarium keeping best practices. " +
     "You provide clear, actionable guidance that helps aquarists maintain healthy reef ecosystems.";
 
+  // Use environment variable or fallback to a model known to support structured outputs well
+  // OpenAI models (GPT-4, GPT-3.5) have the best support for structured JSON responses
+  const model = import.meta.env.OPENROUTER_DEFAULT_MODEL || "openai/gpt-4o-mini";
+
   return await openRouter.createChatCompletion<AIRecommendationResponse>({
     systemMessage,
     userMessage: buildRecommendationPrompt(context),
     responseFormat: RECOMMENDATION_RESPONSE_FORMAT,
-    model: import.meta.env.OPENROUTER_DEFAULT_MODEL || "anthropic/claude-3.5-sonnet",
+    model,
     modelParams: {
       temperature: 0.7,
       max_tokens: 1000,

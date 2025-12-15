@@ -177,7 +177,7 @@ export async function POST(context: APIContext): Promise<Response> {
     let analysis = "";
     let recommendations: string[] = [];
 
-    if (status !== "normal") {
+    if (apiStatus !== "normal") {
       try {
         // Build context for AI
         const aquariumTypeName =

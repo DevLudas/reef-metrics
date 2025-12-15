@@ -4,7 +4,7 @@ import { DashboardHeader } from "./DashboardHeader";
 import { NoAquariumsEmptyState } from "./NoAquariumsEmptyState";
 import { NoMeasurementsEmptyState } from "./NoMeasurementsEmptyState";
 import { ParameterCardsGrid } from "./ParameterCardsGrid";
-import { AIRecommendationDrawer } from "./AIRecommendationDrawer";
+import { AIRecommendationDialog } from "./AIRecommendationDialog";
 import { AddMeasurementForm } from "./AddMeasurementForm";
 import { Toaster } from "@/components/ui/toast";
 import { useToast } from "@/components/hooks/useToast";
@@ -152,7 +152,7 @@ export function DashboardContent({
 
       <ParameterCardsGrid parameters={parameters} onParameterClick={handleParameterClick} />
 
-      <AIRecommendationDrawer
+      <AIRecommendationDialog
         open={isDrawerOpen}
         onOpenChange={handleDrawerClose}
         data={aiRecommendations.data}

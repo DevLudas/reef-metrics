@@ -9,3 +9,4 @@ export { NoMeasurementsEmptyState } from "./NoMeasurementsEmptyState";
 export { ParameterCard } from "./ParameterCard";
 export { ParameterCardsGrid } from "./ParameterCardsGrid";
 export { AIRecommendationDrawer } from "./AIRecommendationDrawer";
+export { AIRecommendationDialog } from "./AIRecommendationDialog";
