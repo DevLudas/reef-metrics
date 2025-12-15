@@ -1,11 +1,5 @@
 import { Sparkles, TrendingUp, TrendingDown, AlertTriangle, Loader2 } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import type { RecommendationResponseDTO } from "@/types";
 
@@ -168,4 +162,3 @@ export function AIRecommendationDialog({ open, onOpenChange, data, loading, erro
     </Dialog>
   );
 }
-
